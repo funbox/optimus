@@ -22,9 +22,9 @@ defmodule OptimusTest do
           required: false,
           parser: fn(value) ->
               if value =~ ~r{\A(?:AA|BB|CC)\z} do
-                {:ok, String.to_integer(value)}
+                {:ok, value}
               else
-                {:error, "Second argument should be one of: AA, BB or CC"}
+                {:error, "should be one of: AA, BB or CC"}
               end
           end
         ],
@@ -67,9 +67,9 @@ defmodule OptimusTest do
           required: false,
           parser: fn(value) ->
               if value =~ ~r{\A(?:DD|EE|FF)\z} do
-                {:ok, String.to_integer(value)}
+                {:ok, value}
               else
-                {:error, "Second argument should be one of: DD, EE or FF"}
+                {:error, "should be one of: DD, EE or FF"}
               end
           end
         ],
