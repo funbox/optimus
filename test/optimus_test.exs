@@ -52,6 +52,7 @@ defmodule OptimusTest do
       ],
       options: [
         first_option: [
+          value_name: "FIRST_OPTION",
           short: "o",
           long: "first-option",
           help: "First option",
@@ -59,6 +60,7 @@ defmodule OptimusTest do
           required: true
         ],
         second_option: [
+          value_name: "SECOND_OPTION",
           short: "t",
           long: "second-option",
           help: "Second option",
