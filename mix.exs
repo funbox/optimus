@@ -27,6 +27,6 @@ defmodule Optimus.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [{:apex, "~>0.6.0", only: [:dev, :test]}]
   end
 end

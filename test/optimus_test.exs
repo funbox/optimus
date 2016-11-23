@@ -2,7 +2,7 @@ defmodule OptimusTest do
   use ExUnit.Case
 
   test "test setup" do
-    parser = Optimus.new(
+    optimus = Optimus.new(
       name: "Elixir App",
       version: "1.0.1",
       author: "Averyanov Ilya av@fun-box.ru",
@@ -14,7 +14,7 @@ defmodule OptimusTest do
           value_name: "FIRST",
           help: "First argument",
           required: true,
-          type: :integer,
+          parser: :integer,
         ],
         second: [
           value_name: "SECOND",
@@ -32,7 +32,7 @@ defmodule OptimusTest do
           value_name: "THIRD",
           help: "Third argument",
           required: false,
-          type: :string,
+          parser: :string,
           default: "third"
         ]
       ],
@@ -56,7 +56,7 @@ defmodule OptimusTest do
           short: "o",
           long: "first-option",
           help: "First option",
-          type: :integer,
+          parser: :integer,
           required: true
         ],
         second_option: [
@@ -76,8 +76,8 @@ defmodule OptimusTest do
       ]
     )
 
-    argv = ["123", "AA", "-f", "--second-flag", "-s", "-o", "123", "--second-option", "DD", "--", "thirdthird"]
+    Apex.ap optimus
 
-    matches = Optimus.match!(parser, argv)
+    assert {:ok, _} = optimus
   end
 end
