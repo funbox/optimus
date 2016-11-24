@@ -1,6 +1,4 @@
 defmodule Optimus.Flag do
-  alias Optimus.Flag
-  alias Optimus.PropertyParsers, as: PP
 
   defstruct [
     :name,
@@ -10,48 +8,29 @@ defmodule Optimus.Flag do
     :multiple
   ]
 
-  def new({name, props}) when is_atom(name) do
-    if Keyword.keyword?(props) do
-        case parse_props(%Flag{name: name}, props) do
-          {:ok, _arg} = res -> res
-          {:error, reason} -> {:error, "invalid flag #{inspect name} properties: #{reason}"}
-        end
+  def new(spec) do
+    Optimus.Flag.Builder.build(spec)
+  end
+
+  def parse(flag, parsed, [item | command_line]) do
+    if flag.short == item || flag.long == item do
+      if flag.multiple || !Map.has_key?(parsed, flag.name) do
+        {:ok, Map.update(parsed, flag.name, 0, &(1 + &1)), command_line}
+      else
+        {:error, "multiple occurances of flag #{inspect flag.name}", command_line}
+      end
     else
-      {:error, "properties for flag #{inspect name} should be a keyword list"}
+      :skip
     end
   end
+  def parse(_, _, _), do: :skip
 
-  defp parse_props(flag, props) do
-    with {:ok, short} <- parse_short(props),
-    {:ok, long} <- parse_long(props),
-    {:ok, help} <- parse_help(props),
-    {:ok, multiple} <- parse_multiple(props),
-    {:ok, flag} <- validate(%Flag{flag| short: short, long: long, help: help, multiple: multiple}),
-    do: {:ok, flag}
-  end
-
-  defp parse_short(props) do
-    PP.parse_short(:short, props[:short])
-  end
-
-  defp parse_long(props) do
-    PP.parse_long(:long, props[:long])
-  end
-
-  defp parse_help(props) do
-    PP.parse_string(:help, props[:help], "")
-  end
-
-  defp parse_multiple(props) do
-    PP.parse_bool(:multiple, props[:multiple], false)
-  end
-
-  defp validate(flag) do
-    if flag.short || flag.long do
-      {:ok, flag}
-    else
-      {:error, "neither :short nor :long form defined"}
+  def try_match([flag | flags], parsed, items) do
+    case parse(flag, parsed, items) do
+      :skip -> try_match(flags, parsed, items)
+      value -> value
     end
   end
+  def try_match([], _, _), do: :skip
 
 end

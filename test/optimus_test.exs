@@ -2,7 +2,7 @@ defmodule OptimusTest do
   use ExUnit.Case
 
   test "test setup" do
-    optimus = Optimus.new(
+    res = Optimus.new(
       name: "Elixir App",
       version: "1.0.1",
       author: "Averyanov Ilya av@fun-box.ru",
@@ -32,8 +32,7 @@ defmodule OptimusTest do
           value_name: "THIRD",
           help: "Third argument",
           required: false,
-          parser: :string,
-          default: "third"
+          parser: :string
         ]
       ],
       flags: [
@@ -75,9 +74,13 @@ defmodule OptimusTest do
         ],
       ]
     )
+    assert {:ok, optimus} = res
 
-    Apex.ap optimus
+    command_line = ~w{123 AA -f --second-flag -s -o 123 --second-option DD -- thirdthird --fourth}
 
-    assert {:ok, _} = optimus
+    parse_result = Optimus.parse(optimus, command_line)
+
+    Apex.ap parse_result
+
   end
 end

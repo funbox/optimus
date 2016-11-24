@@ -1,6 +1,4 @@
 defmodule Optimus.Arg do
-  alias Optimus.Arg
-  alias Optimus.PropertyParsers, as: PP
 
   defstruct [
     :name,
@@ -10,45 +8,16 @@ defmodule Optimus.Arg do
     :parser
   ]
 
-  def new({name, props}) when is_atom(name) do
-    if Keyword.keyword?(props) do
-        case parse_props(%Arg{name: name}, props) do
-          {:ok, _arg} = res -> res
-          {:error, reason} -> {:error, "invalid argument #{inspect name} properties: #{reason}"}
-        end
-    else
-      {:error, "properties for positional argument #{inspect name} should be a keyword list"}
+  def new(spec) do
+    Optimus.Arg.Builder.build(spec)
+  end
+
+  def parse(arg, parsed, [item | command_line]) do
+    case arg.parser.(item) do
+      {:ok, value} -> {:ok, Map.put(parsed, arg.name, value), command_line}
+      {:error, reason} -> {:error, "invalid value #{inspect item} for #{arg.value_name}: #{reason}", command_line}
     end
   end
 
-  defp parse_props(arg, props) do
-    with {:ok, value_name} <- parse_value_name(props, arg.name),
-    {:ok, help} <- parse_help(props),
-    {:ok, required} <- parse_required(props),
-    {:ok, parser} <- parse_parser(props),
-    do: {:ok, %Arg{arg|
-        value_name: value_name,
-        help: help,
-        required: required,
-        parser: parser
-      }}
-  end
-
-  defp parse_value_name(props, name) do
-    default = name |> to_string |> String.upcase
-    PP.parse_string(:value_name, props[:value_name], default)
-  end
-
-  defp parse_help(props) do
-    PP.parse_string(:help, props[:help], "")
-  end
-
-  defp parse_required(props) do
-    PP.parse_bool(:required, props[:required], true)
-  end
-
-  defp parse_parser(props) do
-    PP.parse_parser(:parser, props[:parser])
-  end
 
 end

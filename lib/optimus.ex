@@ -1,5 +1,8 @@
 defmodule Optimus do
-  alias Optimus.PropertyParsers, as: PP
+
+  alias Optimus.Arg
+  alias Optimus.Flag
+  alias Optimus.Option
 
   defstruct [
     :name,
@@ -14,102 +17,98 @@ defmodule Optimus do
   ]
 
   def new(props) do
-    if Keyword.keyword?(props) do
-        case parse_props(props) do
-          {:ok, _arg} = res -> res
-          {:error, reason} -> {:error, "invalid configuration: #{reason}"}
-        end
+    Optimus.Builder.build(props)
+  end
+
+  def parse(optimus, command_line) do
+    with :ok <- validate_command_line(command_line),
+    {parsed, errors, unknown} <- parse_all_kinds({optimus.options, optimus.flags, optimus.args}, %{}, command_line, [], []),
+    errors_with_unknown <- validate_unknown(optimus, unknown, errors),
+    all_errors <- validate_required(optimus, parsed, errors_with_unknown),
+    do: parse_result(optimus, parsed, unknown, all_errors)
+  end
+
+  def validate_command_line(command_line) when is_list(command_line) do
+    if Enum.all?(command_line, &is_binary/1) do
+      :ok
     else
-      {:error, "#{__MODULE__}.new expects a keyword list"}
+      {:error, "list of strings expected"}
     end
   end
+  def validate_command_line(_), do: {:error, "list of strings expected"}
 
-  def parse_props(props) do
-    with {:ok, name} <- parse_name(props),
-    {:ok, version} <- parse_version(props),
-    {:ok, author} <- parse_author(props),
-    {:ok, about} <- parse_about(props),
-    {:ok, allow_extra_args} <- parse_allow_extra_args(props),
-    {:ok, parse_double_dash} <- parse_parse_double_dash(props),
-    {:ok, args} <- parse_args(props[:args]),
-    {:ok, flags} <- parse_flags(props[:flags]),
-    {:ok, options} <- parse_options(props[:options]),
-    :ok <- validate_args(args),
-    :ok <- validate_conflicts(flags, options),
-    do: {:ok, %Optimus{name: name, version: version, author: author, about: about, allow_extra_args: allow_extra_args, parse_double_dash: parse_double_dash, args: args, flags: flags, options: options}}
-  end
+  @end_of_flags_and_options "--"
 
-  defp parse_name(props) do
-    PP.parse_string(:name, props[:name], nil)
-  end
-
-  defp parse_version(props) do
-    PP.parse_string(:version, props[:version], nil)
-  end
-
-  defp parse_author(props) do
-    PP.parse_string(:author, props[:author], nil)
-  end
-
-  defp parse_about(props) do
-    PP.parse_string(:about, props[:about], nil)
-  end
-
-  defp parse_allow_extra_args(props) do
-    PP.parse_bool(:allow_extra_args, props[:allow_extra_args], false)
-  end
-
-  defp parse_parse_double_dash(props) do
-     PP.parse_bool(:parse_double_dash, props[:parse_double_dash], true)
-  end
-
-  defp parse_args(specs), do: parse_specs("args", Optimus.Arg, specs)
-  defp parse_flags(specs), do: parse_specs("flags", Optimus.Flag, specs)
-  defp parse_options(specs), do: parse_specs("options", Optimus.Option, specs)
-
-  defp parse_specs(_name, _module, nil), do: []
-  defp parse_specs(name, module, specs) do
-    if Keyword.keyword?(specs) do
-      parse_specs_(module, specs, [])
+  def parse_all_kinds(_, parsed, [], errors, unknown), do: {parsed, errors, unknown}
+  def parse_all_kinds({options, flags, args} = parsers, parsed, [item | rest_items] = items, errors, unknown) do
+    if item == @end_of_flags_and_options do
+      parse_args(args, parsed, rest_items, errors, unknown)
     else
-      {:error, "#{name} specs are expected to be a Keyword list"}
+      case Option.try_match(options, parsed, items) do
+        {:ok, new_parsed, new_items} -> parse_all_kinds(parsers, new_parsed, new_items, errors, unknown)
+        {:error, error, new_items} -> parse_all_kinds(parsers, parsed, new_items, [error| errors], unknown)
+        :skip ->
+          case Flag.try_match(flags, parsed, items) do
+            {:ok, new_parsed, new_items} -> parse_all_kinds(parsers, new_parsed, new_items, errors, unknown)
+            {:error, error, new_items} -> parse_all_kinds(parsers, parsed, new_items, [error| errors], unknown)
+            :skip ->
+              case args do
+                [arg | other_args] -> case Arg.parse(arg, parsed, items) do
+                  {:ok, new_parsed, new_items} -> parse_all_kinds({options, flags, other_args}, new_parsed, new_items, errors, unknown)
+                  {:error, error, new_items} -> parse_all_kinds({options, flags, other_args}, parsed, new_items, [error| errors], unknown)
+                end
+                [] ->
+                  parse_all_kinds(parsers, parsed, rest_items, errors, [item | unknown])
+              end
+          end
+      end
     end
   end
 
-  defp parse_specs_(_module, [], parsed), do: {:ok, Enum.reverse(parsed)}
-  defp parse_specs_(module, [{_name, _props} = arg_spec | other], parsed) do
-    with {:ok, arg} <- module.new(arg_spec),
-    do: parse_specs_(module, other, [arg | parsed])
+  def parse_args([arg | args], parsed, [_ | _] = items, errors, unknown) do
+    case Arg.parse(arg, parsed, items) do
+      {:ok, new_parsed, new_items} -> parse_args(args, new_parsed, new_items, errors, unknown)
+      {:error, error, new_items} -> parse_args(args, parsed, new_items, [error| errors], unknown)
+    end
   end
+  def parse_args([], parsed, [item | rest], errors, unknown), do: parse_args([], parsed, rest, errors, [item | unknown])
+  def parse_args(_, parsed, [], errors, unknown), do: {parsed, errors, unknown}
 
-  defp validate_args([arg1, arg2 | other]) do
-    if !arg1.required && arg2.required do
-      {:error, "required argument #{inspect arg2.name} follows optional argument #{inspect arg1.name}"}
+  def validate_unknown(_optimus, [], errors), do: errors
+  def validate_unknown(optimus, unknown, errors) do
+    if optimus.allow_extra_args do
+      errors
     else
-      validate_args([arg2 | other])
+      error = "unrecognized arguments: #{unknown |> Enum.map(&inspect/1) |> Enum.join(", ")}"
+      [error | errors]
     end
   end
 
-  defp validate_args(_), do: :ok
+  def validate_required(optimus, parsed, errors) do
+    missing_required_args = optimus.args
+    |> Enum.reject(&Map.has_key?(parsed, &1.name))
+    |> Enum.filter(&(&1.required))
+    |> Enum.map(&(&1.value_name))
 
-  defp validate_conflicts(flags, options) do
-    with :ok <- validate_conflicts(flags, options, :short),
-    :ok <- validate_conflicts(flags, options, :long),
-    do: :ok
-  end
+    missing_required_options = optimus.args
+    |> Enum.reject(&Map.has_key?(parsed, &1.name))
+    |> Enum.filter(&(&1.required))
+    |> Enum.map(&Option.human_name(&1))
 
-  defp validate_conflicts(flags, options, key) do
-    all_options = flags ++ options
-    duplicate = all_options
-    |> Enum.group_by(fn(item) -> Map.get(item, key) end, fn(item) -> item end)
-    |> Map.to_list
-    |> Enum.find(fn({_option_name, options}) -> length(options) > 1 end)
-
-    case duplicate do
-      {name, _} -> {:error, "duplicate #{key} option name: #{name}"}
-      nil -> :ok
+    required_arg_error = case missing_required_args do
+      [] -> []
+      _ -> ["missing required arguments: #{missing_required_args |> Enum.join(", ")}"]
     end
 
+    required_option_error = case missing_required_options do
+      [] -> []
+      _ -> ["missing required options: #{missing_required_options |> Enum.join(", ")}"]
+    end
+
+    required_arg_error ++ required_option_error ++ errors
   end
+
+  def parse_result(optimus, parsed, unknown, []), do: {:ok, {optimus, parsed, unknown}}
+  def parse_result(_optimus, _parsed, _unknown, errors), do: {:error, errors}
 
 end
