@@ -17,6 +17,26 @@ defmodule Optimus do
     :options
   ]
 
+  @type parser_result :: {:error, String.t} | {:ok, term}
+  @type custom_parser :: (String.t -> parser_result)
+  @type parser :: :integer | :float | :string | custom_parser
+
+  @type arg_spec_item :: {:value_name, String.t} | {:help, String.t} | {:required, boolean} | {:parser, parser}
+  @type arg_spec :: [arg_spec_item]
+
+  @type flag_spec_item :: {:short, String.t} | {:long, String.t} | {:help, String.t} | {:multiple, boolean}
+  @type flag_spec :: [flag_spec_item]
+
+  @type option_spec_item :: {:value_name, String.t} | {:short, String.t} | {:long, String.t} | {:help, String.t} | {:multiple, boolean} | {:required, boolean} | {:parser, parser}
+  @type option_spec :: [option_spec_item]
+
+  @type spec_item :: {:name, String.t} | {:executable, String.t} | {:version, String.t} | {:author, String.t} | {:about, String.t} | {:allow_extra_args, boolean} | {:parse_double_dash, boolean} | {:args, [arg_spec]} | {:flags, [flag_spec]} | {:options, [option_spec]}
+  @type spec :: [spec_item]
+
+  @type error :: String.t
+  @opaque optimus :: %Optimus{}
+
+  @spec new(spec) :: {:ok, optimus} | {:error, [error]}
   def new(props) do
     Optimus.Builder.build(props)
   end

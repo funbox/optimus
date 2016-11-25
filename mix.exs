@@ -17,7 +17,6 @@ defmodule Optimus.Mixfile do
         "coveralls.html": :test
       ],
       dialyzer: [
-        plt_file: ".local.plt",
         plt_add_deps: true,
         plt_add_apps: [:ssl],
         flags: ["-Werror_handling", "-Wrace_conditions"],
@@ -44,7 +43,7 @@ defmodule Optimus.Mixfile do
   defp deps do
     [
       {:apex, "~> 0.6.0", only: [:dev, :test]},
-      {:dialyxir, git: "https://github.com/jeremyjh/dialyxir.git", only: :dev},
+      {:dialyxir, "~> 0.4", only: :dev},
       {:excoveralls, "~> 0.5", only: :test}
     ]
   end
