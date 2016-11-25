@@ -29,19 +29,19 @@ defmodule Optimus do
     do: parse_result(optimus, parsed, unknown, all_errors)
   end
 
-  def validate_command_line(command_line) when is_list(command_line) do
+  defp validate_command_line(command_line) when is_list(command_line) do
     if Enum.all?(command_line, &is_binary/1) do
       :ok
     else
       {:error, "list of strings expected"}
     end
   end
-  def validate_command_line(_), do: {:error, "list of strings expected"}
+  defp validate_command_line(_), do: {:error, "list of strings expected"}
 
   @end_of_flags_and_options "--"
 
-  def parse_all_kinds(_, parsed, [], errors, unknown), do: {parsed, errors, unknown}
-  def parse_all_kinds({options, flags, args} = parsers, parsed, [item | rest_items] = items, errors, unknown) do
+  defp parse_all_kinds(_, parsed, [], errors, unknown), do: {parsed, errors, unknown}
+  defp parse_all_kinds({options, flags, args} = parsers, parsed, [item | rest_items] = items, errors, unknown) do
     if item == @end_of_flags_and_options do
       parse_args(args, parsed, rest_items, errors, unknown)
     else
@@ -66,17 +66,17 @@ defmodule Optimus do
     end
   end
 
-  def parse_args([arg | args], parsed, [_ | _] = items, errors, unknown) do
+  defp parse_args([arg | args], parsed, [_ | _] = items, errors, unknown) do
     case Arg.parse(arg, parsed, items) do
       {:ok, new_parsed, new_items} -> parse_args(args, new_parsed, new_items, errors, unknown)
       {:error, error, new_items} -> parse_args(args, parsed, new_items, [error| errors], unknown)
     end
   end
-  def parse_args([], parsed, [item | rest], errors, unknown), do: parse_args([], parsed, rest, errors, [item | unknown])
-  def parse_args(_, parsed, [], errors, unknown), do: {parsed, errors, unknown}
+  defp parse_args([], parsed, [item | rest], errors, unknown), do: parse_args([], parsed, rest, errors, [item | unknown])
+  defp parse_args(_, parsed, [], errors, unknown), do: {parsed, errors, unknown}
 
-  def validate_unknown(_optimus, [], errors), do: errors
-  def validate_unknown(optimus, unknown, errors) do
+  defp validate_unknown(_optimus, [], errors), do: errors
+  defp validate_unknown(optimus, unknown, errors) do
     if optimus.allow_extra_args do
       errors
     else
@@ -109,7 +109,7 @@ defmodule Optimus do
     required_arg_error ++ required_option_error ++ errors
   end
 
-  def parse_result(optimus, parsed, unknown, []), do: {:ok, {optimus, parsed, unknown}}
-  def parse_result(_optimus, _parsed, _unknown, errors), do: {:error, errors}
+  defp parse_result(optimus, parsed, unknown, []), do: {:ok, {optimus, parsed, unknown}}
+  defp parse_result(_optimus, _parsed, _unknown, errors), do: {:error, errors}
 
 end
