@@ -6,6 +6,7 @@ defmodule Optimus do
 
   defstruct [
     :name,
+    :executable,
     :version,
     :author,
     :about,

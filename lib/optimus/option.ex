@@ -31,7 +31,6 @@ defmodule Optimus.Option do
   end
   def parse(_, _, _), do: :skip
 
-
   def try_match([option | options], parsed, items) do
     case parse(option, parsed, items) do
       :skip -> try_match(options, parsed, items)

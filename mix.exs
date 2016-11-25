@@ -2,12 +2,27 @@ defmodule Optimus.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :optimus,
-     version: "0.1.0",
-     elixir: "~> 1.3",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     deps: deps()]
+    [
+      app: :optimus,
+      version: "0.1.0",
+      elixir: "~> 1.3",
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        "coveralls": :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ],
+      dialyzer: [
+        plt_file: ".local.plt",
+        plt_add_deps: true,
+        plt_add_apps: [:ssl],
+        flags: ["-Werror_handling", "-Wrace_conditions"],
+      ]
+   ]
   end
 
   # Configuration for the OTP application
@@ -27,6 +42,10 @@ defmodule Optimus.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:apex, "~>0.6.0", only: [:dev, :test]}]
+    [
+      {:apex, "~> 0.6.0", only: [:dev, :test]},
+      {:dialyxir, git: "https://github.com/jeremyjh/dialyxir.git", only: :dev},
+      {:excoveralls, "~> 0.5", only: :test}
+    ]
   end
 end

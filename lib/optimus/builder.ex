@@ -15,6 +15,7 @@ defmodule Optimus.Builder do
 
   defp build_from_props(props) do
     with {:ok, name} <- build_name(props),
+    {:ok, executable} <- build_executable(props),
     {:ok, version} <- build_version(props),
     {:ok, author} <- build_author(props),
     {:ok, about} <- build_about(props),
@@ -25,11 +26,15 @@ defmodule Optimus.Builder do
     {:ok, options} <- build_options(props[:options]),
     :ok <- validate_args(args),
     :ok <- validate_conflicts(flags, options),
-    do: {:ok, %Optimus{name: name, version: version, author: author, about: about, allow_extra_args: allow_extra_args, parse_double_dash: parse_double_dash, args: args, flags: flags, options: options}}
+    do: {:ok, %Optimus{name: name, version: version, author: author, about: about, allow_extra_args: allow_extra_args, parse_double_dash: parse_double_dash, args: args, flags: flags, options: options, executable: executable}}
   end
 
   defp build_name(props) do
     PP.build_string(:name, props[:name], nil)
+  end
+
+  defp build_executable(props) do
+    PP.build_string(:executable, props[:executable], nil)
   end
 
   defp build_version(props) do
@@ -56,7 +61,7 @@ defmodule Optimus.Builder do
   defp build_flags(specs), do: build_specs("flags", Optimus.Flag, specs)
   defp build_options(specs), do: build_specs("options", Optimus.Option, specs)
 
-  defp build_specs(_name, _module, nil), do: []
+  defp build_specs(_name, _module, nil), do: {:ok, []}
   defp build_specs(name, module, specs) do
     if Keyword.keyword?(specs) do
       build_specs_(module, specs, [])
