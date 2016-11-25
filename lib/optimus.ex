@@ -91,7 +91,7 @@ defmodule Optimus do
     |> Enum.filter(&(&1.required))
     |> Enum.map(&(&1.value_name))
 
-    missing_required_options = optimus.args
+    missing_required_options = optimus.options
     |> Enum.reject(&Map.has_key?(parsed, &1.name))
     |> Enum.filter(&(&1.required))
     |> Enum.map(&Option.human_name(&1))

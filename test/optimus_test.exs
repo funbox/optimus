@@ -256,79 +256,223 @@ defmodule OptimusTest do
     )
   end
 
+  def full_valid_config, do: [
+    executable: "awesome",
+    name: "Elixir App",
+    version: "1.0.1",
+    author: "Averyanov Ilya av@fun-box.ru",
+    about: "Does awesome things",
+    allow_extra_args: true,
+    parse_double_dash: true,
+    args: [
+      first: [
+        value_name: "FIRST",
+        help: "First argument",
+        required: true,
+        parser: :integer,
+      ],
+      second: [
+        value_name: "SECOND",
+        help: "Second argument",
+        required: false,
+        parser: fn(value) ->
+            if value =~ ~r{\A(?:AA|BB|CC)\z} do
+              {:ok, value}
+            else
+              {:error, "should be one of: AA, BB or CC"}
+            end
+        end
+      ],
+      third: [
+        value_name: "THIRD",
+        help: "Third argument",
+        required: false,
+        parser: :string
+      ]
+    ],
+    flags: [
+      first_flag: [
+        short: "f",
+        long: "first-flag",
+        help: "First flag",
+        multiple: false,
+      ],
+      second_flag: [
+        short: "s",
+        long: "second-flag",
+        help: "Second flag",
+        multiple: true,
+      ]
+    ],
+    options: [
+      first_option: [
+        value_name: "FIRST_OPTION",
+        short: "o",
+        long: "first-option",
+        help: "First option",
+        parser: :integer,
+        required: true
+      ],
+      second_option: [
+        value_name: "SECOND_OPTION",
+        short: "t",
+        long: "second-option",
+        help: "Second option",
+        required: false,
+        parser: fn(value) ->
+            if value =~ ~r{\A(?:DD|EE|FF)\z} do
+              {:ok, value}
+            else
+              {:error, "should be one of: DD, EE or FF"}
+            end
+        end
+      ],
+    ]
+  ]
+
   test "test full valid config" do
-    assert {:ok, _} = Optimus.new(
-      executable: "awesome",
-      name: "Elixir App",
-      version: "1.0.1",
-      author: "Averyanov Ilya av@fun-box.ru",
-      about: "Does awesome things",
-      allow_extra_args: true,
-      parse_double_dash: true,
+    assert {:ok, _} = Optimus.new(full_valid_config)
+  end
+
+  test "parse: check format for arg" do
+    {:ok, optimus} = Optimus.new(
       args: [
         first: [
-          value_name: "FIRST",
-          help: "First argument",
-          required: true,
-          parser: :integer,
-        ],
-        second: [
-          value_name: "SECOND",
-          help: "Second argument",
-          required: false,
-          parser: fn(value) ->
-              if value =~ ~r{\A(?:AA|BB|CC)\z} do
-                {:ok, value}
-              else
-                {:error, "should be one of: AA, BB or CC"}
-              end
-          end
-        ],
-        third: [
-          value_name: "THIRD",
-          help: "Third argument",
-          required: false,
-          parser: :string
+          parser: :integer
         ]
-      ],
-      flags: [
-        first_flag: [
-          short: "f",
-          long: "first-flag",
-          help: "First flag",
-          multiple: false,
-        ],
-        second_flag: [
-          short: "s",
-          long: "second-flag",
-          help: "Second flag",
-          multiple: true,
-        ]
-      ],
-      options: [
-        first_option: [
-          value_name: "FIRST_OPTION",
-          short: "o",
-          long: "first-option",
-          help: "First option",
-          parser: :integer,
-          required: true
-        ],
-        second_option: [
-          value_name: "SECOND_OPTION",
-          short: "t",
-          long: "second-option",
-          help: "Second option",
-          required: false,
-          parser: fn(value) ->
-              if value =~ ~r{\A(?:DD|EE|FF)\z} do
-                {:ok, value}
-              else
-                {:error, "should be one of: DD, EE or FF"}
-              end
-          end
-        ],
       ]
     )
+    assert {:error, _} = Optimus.parse(optimus, ~w{not_an_int})
+    assert {:ok, _} = Optimus.parse(optimus, ~w{123})
+
+    {:ok, optimus} = Optimus.new(
+      args: [
+        first: [
+          parser: fn(val) -> case val do
+            "VAL" -> {:ok, "VAL"}
+            _ -> {:error, "val should be \"VAL\""}
+          end end
+        ]
+      ]
+    )
+    assert {:error, _} = Optimus.parse(optimus, ~w{not_VAL})
+    assert {:ok, _} = Optimus.parse(optimus, ~w{VAL})
   end
+
+  test "parse: check format for option" do
+    {:ok, optimus} = Optimus.new(
+      options: [
+        first: [
+          short: "-f",
+          parser: :integer
+        ]
+      ]
+    )
+    assert {:error, _} = Optimus.parse(optimus, ~w{-f not_an_int})
+    assert {:ok, _} = Optimus.parse(optimus, ~w{-f 123})
+
+    {:ok, optimus} = Optimus.new(
+      options: [
+        first: [
+          short: "-f",
+          parser: fn(val) ->
+            case val do
+              "VAL" -> {:ok, "VAL"}
+              _ -> {:error, "val should be \"VAL\""}
+            end
+          end
+        ]
+      ]
+    )
+    assert {:error, _} = Optimus.parse(optimus, ~w{-f not_VAL})
+    assert {:ok, _} = Optimus.parse(optimus, ~w{-f VAL})
+  end
+
+  test "parse: check multiple occurences for option" do
+    {:ok, optimus} = Optimus.new(
+      options: [
+        first: [
+          short: "-f",
+          multiple: true,
+          required: true
+        ],
+        second: [
+          short: "-s",
+          multiple: false,
+          required: true
+        ]
+      ]
+    )
+    assert {:error, _} = Optimus.parse(optimus, ~w{-f a -s b -s c})
+    assert {:ok, _} = Optimus.parse(optimus, ~w{-f a -f b -s c})
+  end
+
+  test "parse: check multiple occurences for flag" do
+    {:ok, optimus} = Optimus.new(
+      flags: [
+        first: [
+          short: "-f",
+          multiple: true
+        ],
+        second: [
+          short: "-s",
+          multiple: false
+        ]
+      ]
+    )
+    assert {:error, _} = Optimus.parse(optimus, ~w{-s -s})
+    assert {:ok, _} = Optimus.parse(optimus, ~w{-f -f})
+  end
+
+  test "parse: invalid command line" do
+    {:ok, optimus} = Optimus.new(allow_extra_args: true)
+    assert {:error, _} = Optimus.parse(optimus, [1, 2, 3])
+  end
+
+  test "parse: unrecognized arguments" do
+    {:ok, optimus} = Optimus.new(
+      args: [
+        first: []
+      ]
+    )
+    assert {:ok, _} = Optimus.parse(optimus, ~w{a1})
+    assert {:error, _} = Optimus.parse(optimus, ~w{a1 a2})
+
+    {:ok, optimus} = Optimus.new(
+      allow_extra_args: true,
+      args: [
+        first: []
+      ]
+    )
+    assert {:ok, _} = Optimus.parse(optimus, ~w{a1 a2})
+  end
+
+  test "parse: missing required args" do
+    {:ok, optimus} = Optimus.new(
+      args: [
+        first: [required: true]
+      ]
+    )
+
+    assert {:ok, _} = Optimus.parse(optimus, ~w{a1})
+    assert {:error, _} = Optimus.parse(optimus, ~w{})
+  end
+
+  test "parse: missing required options" do
+    {:ok, optimus} = Optimus.new(
+      options: [
+        first: [required: true, short: "-f"]
+      ]
+    )
+
+    assert {:ok, _} = Optimus.parse(optimus, ~w{-f a1})
+    assert {:error, _} = Optimus.parse(optimus, ~w{})
+  end
+
+  test "parse: full configuration" do
+    assert {:ok, optimus} = Optimus.new(full_valid_config)
+    command_line = ~w{123 AA -f --second-flag -s -o 123 --second-option DD -- thirdthird --fourth}
+    assert {:ok, _} = Optimus.parse(optimus, command_line)
+  end
+
 end

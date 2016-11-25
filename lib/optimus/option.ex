@@ -23,7 +23,7 @@ defmodule Optimus.Option do
           {:error, reason} -> {:error, "invalid value #{inspect raw_value} for #{human_name(option)} option: #{reason}", command_line}
         end
       else
-        {:error, "multiple occurances of option #{human_name(option)}", command_line}
+        {:error, "multiple occurences of option #{human_name(option)}", command_line}
       end
     else
       :skip

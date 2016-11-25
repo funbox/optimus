@@ -97,7 +97,7 @@ defmodule Optimus.Builder do
     duplicate = all_options
     |> Enum.group_by(fn(item) -> Map.get(item, key) end, fn(item) -> item end)
     |> Map.to_list
-    |> Enum.find(fn({_option_name, options}) -> length(options) > 1 end)
+    |> Enum.find(fn({option_name, options}) -> option_name && length(options) > 1 end)
 
     case duplicate do
       {name, _} -> {:error, "duplicate #{key} option name: #{name}"}

@@ -17,7 +17,7 @@ defmodule Optimus.Flag do
       if flag.multiple || !Map.has_key?(parsed, flag.name) do
         {:ok, Map.update(parsed, flag.name, 0, &(1 + &1)), command_line}
       else
-        {:error, "multiple occurances of flag #{inspect flag.name}", command_line}
+        {:error, "multiple occurences of flag #{inspect flag.name}", command_line}
       end
     else
       :skip
