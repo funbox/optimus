@@ -5,15 +5,15 @@ defmodule OptimusTest do
     assert {:ok, _} = Optimus.new([])
   end
 
-  test "invalid executable" do
-    assert {:error, _} = Optimus.new(
-      executable: 1
-    )
-  end
-
   test "invalid name" do
     assert {:error, _} = Optimus.new(
       name: 1
+    )
+  end
+
+  test "invalid description" do
+    assert {:error, _} = Optimus.new(
+      description: 1
     )
   end
 
@@ -257,8 +257,8 @@ defmodule OptimusTest do
   end
 
   def full_valid_config, do: [
-    executable: "awesome",
-    name: "Elixir App",
+    name: "awesome",
+    description: "Elixir App",
     version: "1.0.1",
     author: "Averyanov Ilya av@fun-box.ru",
     about: "Does awesome things",

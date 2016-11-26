@@ -15,7 +15,7 @@ defmodule Optimus.Builder do
 
   defp build_from_props(props) do
     with {:ok, name} <- build_name(props),
-    {:ok, executable} <- build_executable(props),
+    {:ok, description} <- build_description(props),
     {:ok, version} <- build_version(props),
     {:ok, author} <- build_author(props),
     {:ok, about} <- build_about(props),
@@ -26,15 +26,15 @@ defmodule Optimus.Builder do
     {:ok, options} <- build_options(props[:options]),
     :ok <- validate_args(args),
     :ok <- validate_conflicts(flags, options),
-    do: {:ok, %Optimus{name: name, version: version, author: author, about: about, allow_unknown_args: allow_unknown_args, parse_double_dash: parse_double_dash, args: args, flags: flags, options: options, executable: executable}}
+    do: {:ok, %Optimus{name: name, description: description, version: version, author: author, about: about, allow_unknown_args: allow_unknown_args, parse_double_dash: parse_double_dash, args: args, flags: flags, options: options}}
   end
 
   defp build_name(props) do
     PP.build_string(:name, props[:name], nil)
   end
 
-  defp build_executable(props) do
-    PP.build_string(:executable, props[:executable], nil)
+  defp build_description(props) do
+    PP.build_string(:description, props[:description], nil)
   end
 
   defp build_version(props) do

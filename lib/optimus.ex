@@ -6,7 +6,7 @@ defmodule Optimus do
 
   defstruct [
     :name,
-    :executable,
+    :description,
     :version,
     :author,
     :about,
@@ -39,7 +39,7 @@ defmodule Optimus do
   @type option_spec_item :: {:value_name, String.t} | {:short, String.t} | {:long, String.t} | {:help, String.t} | {:multiple, boolean} | {:required, boolean} | {:parser, parser}
   @type option_spec :: [option_spec_item]
 
-  @type spec_item :: {:name, String.t} | {:executable, String.t} | {:version, String.t} | {:author, String.t} | {:about, String.t} | {:allow_unknown_args, boolean} | {:parse_double_dash, boolean} | {:args, [arg_spec]} | {:flags, [flag_spec]} | {:options, [option_spec]}
+  @type spec_item :: {:name, String.t} | {:name, String.t} | {:version, String.t} | {:author, String.t} | {:about, String.t} | {:allow_unknown_args, boolean} | {:parse_double_dash, boolean} | {:args, [arg_spec]} | {:flags, [flag_spec]} | {:options, [option_spec]}
   @type spec :: [spec_item]
 
   @type error :: String.t
