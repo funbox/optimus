@@ -14,7 +14,9 @@ defmodule Optimus do
     :parse_double_dash,
     :args,
     :flags,
-    :options
+    :options,
+    :subcommands,
+    :subcommand
   ]
 
   defmodule ParseResult do
@@ -52,10 +54,11 @@ defmodule Optimus do
 
   def parse(optimus, command_line) do
     with :ok <- validate_command_line(command_line),
-    {parsed, errors, unknown} <- parse_all_kinds({optimus.options, optimus.flags, optimus.args}, %{}, command_line, [], []),
-    errors_with_unknown <- validate_unknown(optimus, unknown, errors),
-    all_errors <- validate_required(optimus, parsed, errors_with_unknown),
-    do: parse_result(optimus, parsed, unknown, all_errors)
+    {sub_optimus, subcommand_path, sub_command_line} <- find_subcommand(optimus, [], command_line),
+    {parsed, errors, unknown} <- parse_all_kinds({sub_optimus.options, sub_optimus.flags, sub_optimus.args}, %{}, sub_command_line, [], []),
+    errors_with_unknown <- validate_unknown(sub_optimus, unknown, errors),
+    all_errors <- validate_required(sub_optimus, parsed, errors_with_unknown),
+    do: parse_result(sub_optimus, subcommand_path, parsed, unknown, all_errors)
   end
 
   defp get_arg(parsed, arg) do
@@ -93,6 +96,14 @@ defmodule Optimus do
     end
   end
   defp validate_command_line(_), do: {:error, "list of strings expected"}
+
+  defp find_subcommand(optimus, path, []), do: {optimus, Enum.reverse(path), []}
+  defp find_subcommand(optimus, path, [item | items] = command_line) do
+    case Enum.find(optimus.subcommands, &(item == &1.name)) do
+      %Optimus{} = sub_optimus -> find_subcommand(sub_optimus, [sub_optimus.subcommand | path], items)
+      nil -> {optimus, Enum.reverse(path), command_line}
+    end
+  end
 
   @end_of_flags_and_options "--"
 
@@ -165,7 +176,7 @@ defmodule Optimus do
     required_arg_error ++ required_option_error ++ errors
   end
 
-  defp parse_result(optimus, parsed, unknown, []) do
+  defp parse_result(optimus, subcommand_path, parsed, unknown, []) do
     args = optimus.args
     |> Enum.map(fn(arg) -> {arg.name, get_arg(parsed, arg)} end)
     |> Enum.into(%{})
@@ -178,8 +189,16 @@ defmodule Optimus do
     |> Enum.map(fn(option) -> {option.name, get_option(parsed, option)} end)
     |> Enum.into(%{})
 
-    {:ok, %ParseResult{args: args, flags: flags, options: options, unknown: unknown}}
+    parse_result = %ParseResult{args: args, flags: flags, options: options, unknown: unknown}
+    case subcommand_path do
+      [] -> {:ok, parse_result}
+      [_|_] -> {:ok, subcommand_path, parse_result}
+    end
   end
-  defp parse_result(_optimus, _parsed, _unknown, errors), do: {:error, errors}
-
+  defp parse_result(_optimus, subcommand_path, _parsed, _unknown, errors) do
+    case subcommand_path do
+      [] -> {:error, errors}
+      [_|_] -> {:error, subcommand_path, errors}
+    end
+  end
 end

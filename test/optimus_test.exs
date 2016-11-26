@@ -256,6 +256,18 @@ defmodule OptimusTest do
     )
   end
 
+  test "invalid subcommand" do
+    assert {:error, _} = Optimus.new(
+      subcommands: [
+        subcommand: [
+          options: [
+            first: [long: "--lo ng"]
+          ]
+        ]
+      ]
+    )
+  end
+
   def full_valid_config, do: [
     name: "awesome",
     description: "Elixir App",
@@ -327,6 +339,18 @@ defmodule OptimusTest do
             end
         end
       ],
+    ],
+    subcommands: [
+      subcommand: [
+        name: "subcommand",
+        description: "Elixir App",
+        about: "Does awesome things",
+        allow_unknown_args: false,
+        parse_double_dash: false,
+        args: [first: []],
+        flags: [first: [short: "-f"]],
+        options: [first: [short: "-o", parser: :integer]]
+      ]
     ]
   ]
 
@@ -469,6 +493,23 @@ defmodule OptimusTest do
     assert {:error, _} = Optimus.parse(optimus, ~w{})
   end
 
+  test "parse: check subcommand" do
+    {:ok, optimus} = Optimus.new(
+      subcommands: [
+        first: [
+          name: "s1",
+          subcommands: [
+            second: [
+              name: "s2",
+              options: [o: [short: "-o", parser: :integer]]
+            ]
+          ]
+        ]
+      ]
+    )
+    assert {:error, [:first, :second], _} = Optimus.parse(optimus, ~w{s1 s2 -o not_an_int})
+  end
+
   test "parse: full configuration" do
     assert {:ok, optimus} = Optimus.new(full_valid_config)
     command_line = ~w{123 AA -f --second-flag -s -o 123 --second-option DD -- thirdthird --fourth}
@@ -539,7 +580,23 @@ defmodule OptimusTest do
     command_line = ~w{a -f b -o o c -- d}
     assert {:ok, parsed} = Optimus.parse(optimus, command_line)
     assert ~w{b c d} == parsed.unknown
+  end
 
+  test "parse: subcommand" do
+    assert {:ok, optimus} = Optimus.new(
+      subcommands: [
+        sub: [
+          args: [first: []],
+          flags: [first: [short: "-f"]],
+          options: [first: [short: "-o"]]
+        ]
+      ]
+    )
+
+    assert {:ok, [:sub], parsed} = Optimus.parse(optimus, ~w{sub a -f -o o})
+    assert "a" == parsed.args[:first]
+    assert true == parsed.flags[:first]
+    assert "o" == parsed.options[:first]
   end
 
 end

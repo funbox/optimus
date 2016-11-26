@@ -24,9 +24,10 @@ defmodule Optimus.Builder do
     {:ok, args} <- build_args(props[:args]),
     {:ok, flags} <- build_flags(props[:flags]),
     {:ok, options} <- build_options(props[:options]),
+    {:ok, subcommands} <- build_subcommands(props[:subcommands]),
     :ok <- validate_args(args),
     :ok <- validate_conflicts(flags, options),
-    do: {:ok, %Optimus{name: name, description: description, version: version, author: author, about: about, allow_unknown_args: allow_unknown_args, parse_double_dash: parse_double_dash, args: args, flags: flags, options: options}}
+    do: {:ok, %Optimus{name: name, description: description, version: version, author: author, about: about, allow_unknown_args: allow_unknown_args, parse_double_dash: parse_double_dash, args: args, flags: flags, options: options, subcommands: subcommands}}
   end
 
   defp build_name(props) do
@@ -74,6 +75,28 @@ defmodule Optimus.Builder do
   defp build_specs_(module, [{_name, _props} = arg_spec | other], parsed) do
     with {:ok, arg} <- module.new(arg_spec),
     do: build_specs_(module, other, [arg | parsed])
+  end
+
+  defp build_subcommands(nil), do: {:ok, []}
+  defp build_subcommands(subcommands) do
+    if Keyword.keyword?(subcommands) do
+      build_subcommands_(subcommands, [])
+    else
+      {:error, "subcommand specs are expected to be a Keyword list"}
+    end
+  end
+
+  defp build_subcommands_([], parsed), do: {:ok, Enum.reverse(parsed)}
+  defp build_subcommands_([{subcommand_name, props} | other], parsed) do
+    case Optimus.new(props) do
+      {:ok, subcommand} ->
+        subcommand_with_name = case subcommand.name do
+          nil -> %Optimus{subcommand | subcommand: subcommand_name, name: to_string(subcommand_name)}
+          _ -> %Optimus{subcommand | subcommand: subcommand_name}
+        end
+        build_subcommands_(other, [subcommand_with_name | parsed])
+      {:error, error} -> {:error, "error building subcommand #{inspect subcommand_name}: #{error}"}
+    end
   end
 
   defp validate_args([arg1, arg2 | other]) do
