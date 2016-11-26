@@ -9,7 +9,7 @@ defmodule Optimus.Builder do
           {:error, reason} -> {:error, reason}
         end
     else
-      {:error, "#{__MODULE__}.new expects a keyword list"}
+      {:error, "configuration is expected to be a keyword list"}
     end
   end
 
