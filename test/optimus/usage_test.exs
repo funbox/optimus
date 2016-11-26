@@ -4,7 +4,7 @@ defmodule Optimus.UsageTest do
   alias Optimus.Usage
 
   def optimus do
-    {:ok, optimus} = Optimus.new([
+    {:ok, optimus} = Optimus.new(
       name: "awesome",
       args: [
         first: [
@@ -37,7 +37,8 @@ defmodule Optimus.UsageTest do
         second: [
           value_name: "SECOND_OPTION",
           short: "t",
-          long: "second-option"
+          long: "second-option",
+          required: true
         ],
       ],
       subcommands: [
@@ -48,12 +49,12 @@ defmodule Optimus.UsageTest do
           options: [first: [short: "-o"]]
         ]
       ]
-    ])
+    )
     optimus
   end
 
   test "usage: main command" do
-    assert Usage.usage(optimus) == "awesome [--first-flag] [-s] [-o FIRST_OPTION] [--second-option SECOND_OPTION] FIRST [SECOND] [THIRD]"
+    assert Usage.usage(optimus) == "awesome [--first-flag] [-s] [-o FIRST_OPTION] --second-option SECOND_OPTION FIRST [SECOND] [THIRD]"
   end
 
   test "usage: subcommand" do

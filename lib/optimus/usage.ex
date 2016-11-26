@@ -11,13 +11,10 @@ defmodule Optimus.Usage do
     |> Enum.join(" ")
   end
 
-  def find_subcommand(optimus, subcommand_path, subcommand_name \\ [])
   def find_subcommand(optimus, [], subcommand_name), do: {optimus, Enum.reverse(subcommand_name)}
   def find_subcommand(optimus, [subcommand | subcommand_path], subcommand_name) do
-    case Enum.find(optimus.subcommands, &(subcommand == &1.subcommand)) do
-      %Optimus{} = subcommand -> find_subcommand(subcommand, subcommand_path, [subcommand.name | subcommand_name])
-      nil -> {optimus, Enum.reverse(subcommand_name)}
-    end
+    subcommand = Enum.find(optimus.subcommands, &(subcommand == &1.subcommand))
+    find_subcommand(subcommand, subcommand_path, [subcommand.name | subcommand_name])
   end
 
   defp flags_usage(flags) do
@@ -25,8 +22,9 @@ defmodule Optimus.Usage do
     |> Enum.map(&flag_usage(&1))
   end
 
-  defp options_usage(flags) do
-    flags
+  defp options_usage(options) do
+    options
+    |> Enum.sort_by(&(&1.required))
     |> Enum.map(&option_usage(&1))
   end
 
