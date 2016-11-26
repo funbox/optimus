@@ -19,14 +19,14 @@ defmodule Optimus.Builder do
     {:ok, version} <- build_version(props),
     {:ok, author} <- build_author(props),
     {:ok, about} <- build_about(props),
-    {:ok, allow_extra_args} <- build_allow_extra_args(props),
+    {:ok, allow_unknown_args} <- build_allow_unknown_args(props),
     {:ok, parse_double_dash} <- build_parse_double_dash(props),
     {:ok, args} <- build_args(props[:args]),
     {:ok, flags} <- build_flags(props[:flags]),
     {:ok, options} <- build_options(props[:options]),
     :ok <- validate_args(args),
     :ok <- validate_conflicts(flags, options),
-    do: {:ok, %Optimus{name: name, version: version, author: author, about: about, allow_extra_args: allow_extra_args, parse_double_dash: parse_double_dash, args: args, flags: flags, options: options, executable: executable}}
+    do: {:ok, %Optimus{name: name, version: version, author: author, about: about, allow_unknown_args: allow_unknown_args, parse_double_dash: parse_double_dash, args: args, flags: flags, options: options, executable: executable}}
   end
 
   defp build_name(props) do
@@ -49,8 +49,8 @@ defmodule Optimus.Builder do
     PP.build_string(:about, props[:about], nil)
   end
 
-  defp build_allow_extra_args(props) do
-    PP.build_bool(:allow_extra_args, props[:allow_extra_args], false)
+  defp build_allow_unknown_args(props) do
+    PP.build_bool(:allow_unknown_args, props[:allow_unknown_args], false)
   end
 
   defp build_parse_double_dash(props) do

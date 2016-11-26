@@ -14,7 +14,7 @@ defmodule Optimus.Arg do
 
   def parse(arg, parsed, [item | command_line]) do
     case arg.parser.(item) do
-      {:ok, value} -> {:ok, Map.put(parsed, arg.name, value), command_line}
+      {:ok, value} -> {:ok, Map.put(parsed, {:arg, arg.name}, value), command_line}
       {:error, reason} -> {:error, "invalid value #{inspect item} for #{arg.value_name}: #{reason}", command_line}
     end
   end

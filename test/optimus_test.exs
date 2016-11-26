@@ -35,9 +35,9 @@ defmodule OptimusTest do
     )
   end
 
-  test "invalid allow_extra_args" do
+  test "invalid allow_unknown_args" do
     assert {:error, _} = Optimus.new(
-      allow_extra_args: "allow"
+      allow_unknown_args: "allow"
     )
   end
 
@@ -262,7 +262,7 @@ defmodule OptimusTest do
     version: "1.0.1",
     author: "Averyanov Ilya av@fun-box.ru",
     about: "Does awesome things",
-    allow_extra_args: true,
+    allow_unknown_args: true,
     parse_double_dash: true,
     args: [
       first: [
@@ -291,13 +291,13 @@ defmodule OptimusTest do
       ]
     ],
     flags: [
-      first_flag: [
+      first: [
         short: "f",
         long: "first-flag",
         help: "First flag",
         multiple: false,
       ],
-      second_flag: [
+      second: [
         short: "s",
         long: "second-flag",
         help: "Second flag",
@@ -305,7 +305,7 @@ defmodule OptimusTest do
       ]
     ],
     options: [
-      first_option: [
+      first: [
         value_name: "FIRST_OPTION",
         short: "o",
         long: "first-option",
@@ -313,7 +313,7 @@ defmodule OptimusTest do
         parser: :integer,
         required: true
       ],
-      second_option: [
+      second: [
         value_name: "SECOND_OPTION",
         short: "t",
         long: "second-option",
@@ -425,7 +425,7 @@ defmodule OptimusTest do
   end
 
   test "parse: invalid command line" do
-    {:ok, optimus} = Optimus.new(allow_extra_args: true)
+    {:ok, optimus} = Optimus.new(allow_unknown_args: true)
     assert {:error, _} = Optimus.parse(optimus, [1, 2, 3])
   end
 
@@ -439,7 +439,7 @@ defmodule OptimusTest do
     assert {:error, _} = Optimus.parse(optimus, ~w{a1 a2})
 
     {:ok, optimus} = Optimus.new(
-      allow_extra_args: true,
+      allow_unknown_args: true,
       args: [
         first: []
       ]
@@ -473,6 +473,73 @@ defmodule OptimusTest do
     assert {:ok, optimus} = Optimus.new(full_valid_config)
     command_line = ~w{123 AA -f --second-flag -s -o 123 --second-option DD -- thirdthird --fourth}
     assert {:ok, _} = Optimus.parse(optimus, command_line)
+  end
+
+  test "parse: args" do
+    assert {:ok, optimus} = Optimus.new(args: [
+      first: [parser: :integer],
+      second: [parser: :float],
+      third: [parser: :string],
+      fourth: [],
+      fifth: [parser: fn(val) -> {:ok, val <> val} end]
+    ])
+    command_line = ~w{123 2.5 third fourth fifth}
+    assert {:ok, parsed} = Optimus.parse(optimus, command_line)
+
+    assert 123 == parsed.args[:first]
+    assert 2.5 == parsed.args[:second]
+    assert "third" == parsed.args[:third]
+    assert "fourth" == parsed.args[:fourth]
+    assert "fifthfifth" == parsed.args[:fifth]
+  end
+
+  test "parse: flags" do
+    assert {:ok, optimus} = Optimus.new(flags: [
+        first: [short: "-f"],
+        second: [long: "--second"],
+        third: [short: "-t", long: "--third", multiple: true],
+        fourth: [long: "--fourth", multiple: true],
+        fifth: [long: "--fifth"]
+    ])
+    command_line = ~w{-f --second -t --third}
+    assert {:ok, parsed} = Optimus.parse(optimus, command_line)
+    assert true == parsed.flags[:first]
+    assert true == parsed.flags[:second]
+    assert 2 == parsed.flags[:third]
+    assert 0 == parsed.flags[:fourth]
+    assert false == parsed.flags[:fifth]
+  end
+
+  test "parse: options" do
+    assert {:ok, optimus} = Optimus.new(options: [
+        first: [short: "-f", parser: :integer],
+        second: [long: "--second", parser: :float],
+        third: [short: "-t", long: "--third", multiple: true, parser: fn(val) -> {:ok, {val}} end],
+        fourth: [long: "--fourth", multiple: true, required: false],
+        fifth: [long: "--fifth", required: false]
+    ])
+    command_line = ~w{-f 123 --second 2.5 -t a --third b}
+    assert {:ok, parsed} = Optimus.parse(optimus, command_line)
+
+    assert 123 == parsed.options[:first]
+    assert 2.5 == parsed.options[:second]
+    assert [{"a"}, {"b"}] == parsed.options[:third]
+    assert [] == parsed.options[:fourth]
+    assert nil == parsed.options[:fifth]
+  end
+
+  test "parse: unknown" do
+    assert {:ok, optimus} = Optimus.new(
+      allow_unknown_args: true,
+      args: [first: []],
+      flags: [first: [short: "-f"]],
+      options: [first: [short: "-o"]]
+    )
+
+    command_line = ~w{a -f b -o o c -- d}
+    assert {:ok, parsed} = Optimus.parse(optimus, command_line)
+    assert ~w{b c d} == parsed.unknown
+
   end
 
 end

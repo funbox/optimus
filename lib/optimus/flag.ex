@@ -14,8 +14,9 @@ defmodule Optimus.Flag do
 
   def parse(flag, parsed, [item | command_line]) do
     if flag.short == item || flag.long == item do
-      if flag.multiple || !Map.has_key?(parsed, flag.name) do
-        {:ok, Map.update(parsed, flag.name, 0, &(1 + &1)), command_line}
+      key = {:flag, flag.name}
+      if flag.multiple || !Map.has_key?(parsed, key) do
+        {:ok, Map.update(parsed, key, 1, &(1 + &1)), command_line}
       else
         {:error, "multiple occurences of flag #{inspect flag.name}", command_line}
       end

@@ -17,9 +17,10 @@ defmodule Optimus.Option do
 
   def parse(option, parsed, [item, raw_value | command_line]) do
     if option.short == item || option.long == item do
-      if option.multiple || !Map.has_key?(parsed, option.name) do
+      key = {:option, option.name}
+      if option.multiple || !Map.has_key?(parsed, key) do
         case option.parser.(raw_value) do
-          {:ok, value} -> {:ok, Map.update(parsed, option.name, [value], &([value | &1])), command_line}
+          {:ok, value} -> {:ok, Map.update(parsed, key, [value], &([value | &1])), command_line}
           {:error, reason} -> {:error, "invalid value #{inspect raw_value} for #{human_name(option)} option: #{reason}", command_line}
         end
       else
