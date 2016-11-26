@@ -12,8 +12,8 @@ defmodule Optimus.Usage do
   end
 
   def find_subcommand(optimus, [], subcommand_name), do: {optimus, Enum.reverse(subcommand_name)}
-  def find_subcommand(optimus, [subcommand | subcommand_path], subcommand_name) do
-    subcommand = Enum.find(optimus.subcommands, &(subcommand == &1.subcommand))
+  def find_subcommand(optimus, [subcommand_id | subcommand_path], subcommand_name) do
+    subcommand = Enum.find(optimus.subcommands, &(subcommand_id == &1.subcommand))
     find_subcommand(subcommand, subcommand_path, [subcommand.name | subcommand_name])
   end
 
