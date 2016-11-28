@@ -22,7 +22,7 @@ defmodule Optimus.ColumnPrinterTest do
   test "format ok" do
     IO.puts ""
     IO.puts ""
-    formatted = CP.format([4, {30, :center}, 8, {30, :center}], ["", s1, "", s2])
+    formatted = CP.format([4, {30, :left}, 8, {30, :left}], ["", s1, "", s2])
     for line <- formatted, do: IO.puts(line)
 
   end

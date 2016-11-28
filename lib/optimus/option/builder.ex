@@ -14,18 +14,15 @@ defmodule Optimus.Option.Builder do
   ]
 
   def build({name, props}) do
-    if Keyword.keyword?(props) do
-        case build_from_props(%Option{name: name}, props) do
-          {:ok, _arg} = res -> res
-          {:error, reason} -> {:error, "invalid option #{inspect name} properties: #{reason}"}
-        end
-    else
-      {:error, "properties for option #{inspect name} should be a keyword list"}
+    case build_from_props(%Option{name: name}, props) do
+      {:ok, _option} = res -> res
+      {:error, reason} -> {:error, "invalid option #{inspect name} properties: #{reason}"}
     end
   end
 
   defp build_from_props(option, props) do
-    with {:ok, value_name} <- build_value_name(props, option.name),
+    with :ok <- validate_keyword_list(option.name, props),
+    {:ok, value_name} <- build_value_name(props, option.name),
     {:ok, short} <- build_short(props),
     {:ok, long} <- build_long(props),
     {:ok, help} <- build_help(props),
@@ -34,6 +31,14 @@ defmodule Optimus.Option.Builder do
     {:ok, parser} <- build_parser(props),
     {:ok, option} <- validate(%Option{option| value_name: value_name, short: short, long: long, help: help, multiple: multiple, required: required, parser: parser}),
     do: {:ok, option}
+  end
+
+  defp validate_keyword_list(name, list) do
+    if Keyword.keyword?(list) do
+      :ok
+    else
+      {:error, "properties for option #{inspect name} should be a keyword list"}
+    end
   end
 
   defp build_value_name(props, name) do

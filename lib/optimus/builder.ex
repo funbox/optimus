@@ -3,18 +3,8 @@ defmodule Optimus.Builder do
   alias Optimus.PropertyParsers, as: PP
 
   def build(props) do
-    if Keyword.keyword?(props) do
-        case build_from_props(props) do
-          {:ok, _arg} = res -> res
-          {:error, reason} -> {:error, reason}
-        end
-    else
-      {:error, "configuration is expected to be a keyword list"}
-    end
-  end
-
-  defp build_from_props(props) do
-    with {:ok, name} <- build_name(props),
+    with :ok <- validate_keyword_list(props),
+    {:ok, name} <- build_name(props),
     {:ok, description} <- build_description(props),
     {:ok, version} <- build_version(props),
     {:ok, author} <- build_author(props),
@@ -96,6 +86,14 @@ defmodule Optimus.Builder do
         end
         build_subcommands_(other, [subcommand_with_name | parsed])
       {:error, error} -> {:error, "error building subcommand #{inspect subcommand_name}: #{error}"}
+    end
+  end
+
+  def validate_keyword_list(list) do
+    if Keyword.keyword?(list) do
+      :ok
+    else
+      {:error, "configuration is expected to be a keyword list"}
     end
   end
 

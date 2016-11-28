@@ -3,18 +3,15 @@ defmodule Optimus.Arg.Builder do
   alias Optimus.PropertyParsers, as: PP
 
   def build({name, props}) do
-    if Keyword.keyword?(props) do
-        case build_from_props(%Arg{name: name}, props) do
-          {:ok, _arg} = res -> res
-          {:error, reason} -> {:error, "invalid argument #{inspect name} properties: #{reason}"}
-        end
-    else
-      {:error, "properties for positional argument #{inspect name} should be a keyword list"}
+    case build_from_props(%Arg{name: name}, props) do
+      {:ok, _arg} = res -> res
+      {:error, reason} -> {:error, "invalid argument #{inspect name} properties: #{reason}"}
     end
   end
 
   defp build_from_props(arg, props) do
-    with {:ok, value_name} <- build_value_name(props, arg.name),
+    with :ok <- validate_keyword_list(arg.name, props),
+    {:ok, value_name} <- build_value_name(props, arg.name),
     {:ok, help} <- build_help(props),
     {:ok, required} <- build_required(props),
     {:ok, parser} <- build_parser(props),
@@ -24,6 +21,14 @@ defmodule Optimus.Arg.Builder do
         required: required,
         parser: parser
       }}
+  end
+
+  defp validate_keyword_list(name, list) do
+    if Keyword.keyword?(list) do
+      :ok
+    else
+      {:error, "properties for positional argument #{inspect name} should be a keyword list"}
+    end
   end
 
   defp build_value_name(props, name) do

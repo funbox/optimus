@@ -11,23 +11,28 @@ defmodule Optimus.Flag.Builder do
   ]
 
   def build({name, props}) do
-    if Keyword.keyword?(props) do
-        case build_from_props(%Flag{name: name}, props) do
-          {:ok, _arg} = res -> res
-          {:error, reason} -> {:error, "invalid flag #{inspect name} properties: #{reason}"}
-        end
-    else
-      {:error, "properties for flag #{inspect name} should be a keyword list"}
+    case build_from_props(%Flag{name: name}, props) do
+      {:ok, _arg} = res -> res
+      {:error, reason} -> {:error, "invalid flag #{inspect name} properties: #{reason}"}
     end
   end
 
   defp build_from_props(flag, props) do
-    with {:ok, short} <- build_short(props),
+    with :ok <- validate_keyword_list(flag.name, props),
+    {:ok, short} <- build_short(props),
     {:ok, long} <- build_long(props),
     {:ok, help} <- build_help(props),
     {:ok, multiple} <- build_multiple(props),
     {:ok, flag} <- validate(%Flag{flag| short: short, long: long, help: help, multiple: multiple}),
     do: {:ok, flag}
+  end
+
+  defp validate_keyword_list(name, list) do
+    if Keyword.keyword?(list) do
+      :ok
+    else
+      {:error, "properties for flag #{inspect name} should be a keyword list"}
+    end
   end
 
   defp build_short(props) do
