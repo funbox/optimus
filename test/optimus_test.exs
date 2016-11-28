@@ -9,6 +9,11 @@ defmodule OptimusTest do
     assert {:error, _} = Optimus.new(
       name: 1
     )
+
+    assert {:error, _} = Optimus.new(
+      name: "name with spaces"
+    )
+
   end
 
   test "invalid description" do
@@ -586,6 +591,7 @@ defmodule OptimusTest do
     assert {:ok, optimus} = Optimus.new(
       subcommands: [
         sub: [
+          name: "sub",
           args: [first: []],
           flags: [first: [short: "-f"]],
           options: [first: [short: "-o"]]

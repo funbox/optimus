@@ -49,7 +49,17 @@ defmodule Optimus do
 
   @spec new(spec) :: {:ok, optimus} | {:error, [error]}
   def new(props) do
-    Optimus.Builder.build(props)
+    props
+    |> set_default_name
+    |> Optimus.Builder.build
+  end
+
+  defp set_default_name(props) do
+    if Keyword.keyword?(props) && props[:name] == nil do
+      Keyword.put(props, :name, to_string(:escript.script_name))
+    else
+      props
+    end
   end
 
   def parse(optimus, command_line) do
@@ -65,14 +75,14 @@ defmodule Optimus do
     Map.get(parsed, {:arg, arg.name})
   end
 
-  def get_flag(parsed, flag) do
+  defp get_flag(parsed, flag) do
     case flag do
       %Flag{multiple: true} -> Map.get(parsed, {:flag, flag.name}, 0)
       _ -> if Map.get(parsed, {:flag, flag.name}), do: true, else: false
     end
   end
 
-  def get_option(parsed, option) do
+  defp get_option(parsed, option) do
     case option do
       %Option{multiple: true} ->
         parsed

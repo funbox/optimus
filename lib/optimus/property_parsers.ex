@@ -38,8 +38,14 @@ defmodule Optimus.PropertyParsers do
 
   defp string_parser(value) when is_binary(value), do: {:ok, value}
 
-  def build_string_strict(_name, value) when is_binary(value), do: {:ok, value}
-  def build_string_strict(name, _), do: {:error, "value of #{inspect name} property is expected to be String"}
+  def build_command_name(name, value) when is_binary(value) do
+    if !(value =~ ~r/\s/) do
+     {:ok, value}
+    else
+     {:error, "value of #{inspect name} property is expected to be String without spaces"}
+    end
+  end
+  def build_command_name(name, _), do: {:error, "value of #{inspect name} property is expected to be String"}
 
   def build_string(name, value, default \\ "")
   def build_string(_name, nil, default), do: {:ok, default}

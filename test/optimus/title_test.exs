@@ -30,6 +30,7 @@ defmodule Optimus.TitleTest do
       about: "Does awesome things",
       subcommands: [
         subcommand: [
+          name: "sub",
           description: "Elixir SubApp",
           version: "1.1.1",
           author: "Sub Author",
@@ -49,6 +50,7 @@ defmodule Optimus.TitleTest do
       about: "Does awesome things",
       subcommands: [
         subcommand: [
+          name: "sub"
         ]
       ]
     )

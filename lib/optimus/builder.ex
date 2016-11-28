@@ -21,7 +21,7 @@ defmodule Optimus.Builder do
   end
 
   defp build_name(props) do
-    PP.build_string(:name, props[:name], nil)
+    PP.build_command_name(:name, props[:name])
   end
 
   defp build_description(props) do
@@ -78,7 +78,7 @@ defmodule Optimus.Builder do
 
   defp build_subcommands_([], parsed), do: {:ok, Enum.reverse(parsed)}
   defp build_subcommands_([{subcommand_name, props} | other], parsed) do
-    case Optimus.new(props) do
+    case build(props) do
       {:ok, subcommand} ->
         subcommand_with_name = case subcommand.name do
           nil -> %Optimus{subcommand | subcommand: subcommand_name, name: to_string(subcommand_name)}
