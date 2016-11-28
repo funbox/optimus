@@ -1,13 +1,56 @@
-defmodule Optimus.ColumnPrinter do
+defmodule Optimus.ColumnFormatter do
 
+  @type align :: :left | :center | :right
+  @type column_spec :: pos_integer | {pos_integer, align}
+
+  @spec format([column_spec], [String.t]) :: {:ok, [[String.t]]} | {:error, String.t}
   def format(column_specs, strings) do
+    with :ok <- validate(column_specs, strings),
+    do: {:ok, format_valid(column_specs, strings)}
+  end
+
+  defp format_valid(column_specs, strings) do
     column_specs
     |> Enum.zip(strings)
     |> Enum.map(fn {spec, string} -> {spec, split(string, width(spec))} end)
     |> to_lines
   end
 
-  def split(string, max_width) do
+  defp validate(column_specs, strings) do
+    with :ok <- validate_lengths(column_specs, strings),
+    :ok <- validate_strings(strings),
+    :ok <- validate_specs(column_specs),
+    do: :ok
+  end
+
+  defp validate_lengths(column_specs, strings) when is_list(column_specs) and is_list(strings) do
+    if length(column_specs) == length(strings) do
+      :ok
+    else
+      {:error, "arguments should have equal lengths"}
+    end
+  end
+  defp validate_lengths(_, _), do: {:error, "arguments should be lists"}
+
+  defp validate_strings([]), do: :ok
+  defp validate_strings([string | strings]) do
+    if is_binary(string) do
+      validate_strings(strings)
+    else
+      {:error, "second argument is expected to be a list of strings"}
+    end
+  end
+
+  defp validate_specs([]), do: :ok
+  defp validate_specs([spec | specs]) do
+    case spec do
+      val when is_integer(val) and val > 0 -> validate_specs(specs)
+      {val, align} when is_integer(val) and val > 0 and (align == :left or align == :center or align == :right) -> validate_specs(specs)
+      _ -> {:error, "first argument is expected to be a list of width specs, where width spec is a positive integer or a tuple {width, align} where width is a positive integer and align is one of: :left, :center or :right"}
+    end
+  end
+
+  defp split(string, max_width) do
     string
     |> String.graphemes
     |> split_graphemes(max_width, [])
@@ -26,7 +69,6 @@ defmodule Optimus.ColumnPrinter do
   defp to_line([], converted) do
     converted
     |> Enum.reverse
-    |> Enum.join
   end
   defp to_line([head|heads], converted) do
     {spec, line_part} = head
