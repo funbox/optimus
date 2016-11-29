@@ -19,5 +19,22 @@ defmodule Optimus.Arg do
     end
   end
 
+end
+
+defimpl Optimus.Format, for: Optimus.Arg do
+
+  def format(arg), do: arg.value_name
+
+  def format_in_error(arg), do: arg.value_name
+
+  def format_in_usage(arg) do
+    if arg.required do
+      arg.value_name
+    else
+      "[#{arg.value_name}]"
+    end
+  end
+
+  def help(arg), do: arg.help
 
 end

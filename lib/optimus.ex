@@ -166,12 +166,12 @@ defmodule Optimus do
     missing_required_args = optimus.args
     |> Enum.reject(&Map.has_key?(parsed, {:arg, &1.name}))
     |> Enum.filter(&(&1.required))
-    |> Enum.map(&(&1.value_name))
+    |> Enum.map(&Optimus.Format.format_in_error(&1))
 
     missing_required_options = optimus.options
     |> Enum.reject(&Map.has_key?(parsed, {:option, &1.name}))
     |> Enum.filter(&(&1.required))
-    |> Enum.map(&Option.human_name(&1))
+    |> Enum.map(&Optimus.Format.format_in_error(&1))
 
     required_arg_error = case missing_required_args do
       [] -> []

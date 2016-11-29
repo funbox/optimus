@@ -21,10 +21,10 @@ defmodule Optimus.Option do
       if option.multiple || !Map.has_key?(parsed, key) do
         case option.parser.(raw_value) do
           {:ok, value} -> {:ok, Map.update(parsed, key, [value], &([value | &1])), command_line}
-          {:error, reason} -> {:error, "invalid value #{inspect raw_value} for #{human_name(option)} option: #{reason}", command_line}
+          {:error, reason} -> {:error, "invalid value #{inspect raw_value} for #{Optimus.Format.format_in_error(option)} option: #{reason}", command_line}
         end
       else
-        {:error, "multiple occurences of option #{human_name(option)}", command_line}
+        {:error, "multiple occurences of option #{Optimus.Format.format_in_error(option)}", command_line}
       end
     else
       :skip
@@ -40,12 +40,33 @@ defmodule Optimus.Option do
   end
   def try_match([], _, _), do: :skip
 
-  def human_name(option) do
+end
+
+defimpl Optimus.Format, for: Optimus.Option do
+
+  def format(option) do
+    [option.short, option.long]
+    |> Enum.reject(&is_nil/1)
+    |> Enum.join(", ")
+  end
+
+  def format_in_error(option) do
     case {option.long, option.short} do
       {long, nil} -> long
       {nil, short} -> short
       {long, short} -> "#{long}(#{short})"
     end
   end
+
+  def format_in_usage(option) do
+    option_name = option.long || option.short
+    if option.required do
+      "#{option_name} #{option.value_name}"
+    else
+      "[#{option_name} #{option.value_name}]"
+    end
+  end
+
+  def help(option), do: option.help
 
 end
