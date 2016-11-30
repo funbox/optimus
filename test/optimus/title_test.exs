@@ -11,7 +11,7 @@ defmodule Optimus.TitleTest do
       about: "Does awesome things"
     )
 
-    assert "Elixir App 1.0.1\nAveryanov Ilya av@fun-box.ru\nDoes awesome things\n" == Title.title(optimus)
+    assert ["Elixir App 1.0.1", "Averyanov Ilya av@fun-box.ru", "Does awesome things"] == Title.title(optimus)
   end
 
   test "main command title: with empty fields" do
@@ -19,7 +19,7 @@ defmodule Optimus.TitleTest do
       description: "Elixir App",
     )
 
-    assert "Elixir App\n" == Title.title(optimus)
+    assert ["Elixir App"] == Title.title(optimus)
   end
 
   test "subcommand title: full" do
@@ -39,7 +39,7 @@ defmodule Optimus.TitleTest do
       ]
     )
 
-    assert "Elixir SubApp 1.1.1\nSub Author\nDoes subawesome things\n" == Title.title(optimus, [:subcommand])
+    assert ["Elixir SubApp 1.1.1", "Sub Author", "Does subawesome things"] == Title.title(optimus, [:subcommand])
   end
 
   test "subcommand title: with empty fields" do
@@ -55,7 +55,7 @@ defmodule Optimus.TitleTest do
       ]
     )
 
-    assert "Elixir App 1.0.1\nAveryanov Ilya av@fun-box.ru\nDoes awesome things\n" == Title.title(optimus, [:subcommand])
+    assert ["Elixir App 1.0.1", "Averyanov Ilya av@fun-box.ru", "Does awesome things"] == Title.title(optimus, [:subcommand])
   end
 
 

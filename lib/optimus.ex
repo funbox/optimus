@@ -54,14 +54,6 @@ defmodule Optimus do
     |> Optimus.Builder.build
   end
 
-  defp set_default_name(props) do
-    if Keyword.keyword?(props) && props[:name] == nil do
-      Keyword.put(props, :name, to_string(:escript.script_name))
-    else
-      props
-    end
-  end
-
   def parse(optimus, command_line) do
     with :ok <- validate_command_line(command_line),
     {sub_optimus, subcommand_path, sub_command_line} <- find_subcommand(optimus, [], command_line),
@@ -69,6 +61,23 @@ defmodule Optimus do
     errors_with_unknown <- validate_unknown(sub_optimus, unknown, errors),
     all_errors <- validate_required(sub_optimus, parsed, errors_with_unknown),
     do: parse_result(sub_optimus, subcommand_path, parsed, unknown, all_errors)
+  end
+
+  def fetch_subcommand(optimus, subcommand_path), do: fetch_subcommand(optimus, subcommand_path, [optimus.name])
+  defp fetch_subcommand(optimus, [], subcommand_name), do: {optimus, Enum.reverse(subcommand_name)}
+  defp fetch_subcommand(optimus, [subcommand_id | subcommand_path], subcommand_name) do
+    subcommand = Enum.find(optimus.subcommands, &(subcommand_id == &1.subcommand))
+    fetch_subcommand(subcommand, subcommand_path, [subcommand.name | subcommand_name])
+  end
+
+  # private functions
+
+  defp set_default_name(props) do
+    if Keyword.keyword?(props) && props[:name] == nil do
+      Keyword.put(props, :name, to_string(:escript.script_name))
+    else
+      props
+    end
   end
 
   defp get_arg(parsed, arg) do
@@ -95,8 +104,6 @@ defmodule Optimus do
         end
     end
   end
-
-  # private functions
 
   defp validate_command_line(command_line) when is_list(command_line) do
     if Enum.all?(command_line, &is_binary/1) do
@@ -162,7 +169,7 @@ defmodule Optimus do
     end
   end
 
-  def validate_required(optimus, parsed, errors) do
+  defp validate_required(optimus, parsed, errors) do
     missing_required_args = optimus.args
     |> Enum.reject(&Map.has_key?(parsed, {:arg, &1.name}))
     |> Enum.filter(&(&1.required))
@@ -211,4 +218,15 @@ defmodule Optimus do
       [_|_] -> {:error, subcommand_path, errors}
     end
   end
+
+end
+
+defimpl Optimus.Format, for: Optimus do
+
+  def format(optimus), do: optimus.name
+  def format_in_error(optimus), do: optimus.name
+  def format_in_usage(optimus), do: optimus.name
+
+  def help(optimus), do: optimus.about
+
 end

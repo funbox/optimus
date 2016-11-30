@@ -1,45 +1,41 @@
 defmodule Optimus.Help do
 
-  alias Optimus.ColumnFormatter, as: CF
-  alias Optimus.Format
+  def help(optimus, subcommand_path, max_width) do
 
-  @left_pading 4
-  @separaion_padding 8
+    title = Optimus.Title.title(optimus, subcommand_path)
+    usage = Optimus.Usage.usage(optimus, subcommand_path)
 
-  @simple_separator ": "
+    {subcommand, _} = Optimus.fetch_subcommand(optimus, subcommand_path)
 
-  def formatable_help(title, formatables, max_width) when max_width > 0 do
-    [title, ""] ++ formatted_help(formatables, max_width)
+    formatable_help = subcommand_formatables(subcommand)
+    |> nonempty_formatables
+    |> formatable_help(max_width)
+
+    title ++ ["", "USAGE:", "    " <> usage, ""] ++ formatable_help
+
   end
 
-  defp formatted_help(formatables, max_width) do
-    widths = get_column_widths(formatables, max_width)
-    formatables
-    |> Enum.map(&(format_columns(widths, &1)))
+  defp subcommand_formatables(subcommand) do
+    [
+      {"ARGS:", subcommand.args},
+      {"FLAGS:", subcommand.flags},
+      {"OPTIONS:", subcommand.options},
+      {"SUBCOMMANDS:", subcommand.subcommands}
+    ]
+  end
+
+  defp nonempty_formatables(formatables_with_titles) do
+    formatables_with_titles
+    |> Enum.reject(fn {_, list} ->  is_nil(list) end)
+  end
+
+  defp formatable_help(formatables_with_titles, max_width) do
+    formatables_with_titles
+    |> Enum.map(fn {title, formatables} ->
+      Optimus.FormatableHelp.formatable_help(title, formatables, max_width)
+    end)
+    |> Enum.intersperse([""])
     |> Enum.concat
-    |> Enum.map(&(Enum.join(&1)))
-  end
-
-  defp format_columns({:ok, widths}, formatable) do
-    {:ok, formatted} = CF.format(widths, ["", Format.format(formatable), "", Format.help(formatable)])
-    formatted
-  end
-  defp format_columns(:not_enough_space, formatable) do
-    [[Format.format(formatable), @simple_separator, Format.help(formatable)]]
-  end
-
-  defp get_formatable_max_width(formatables) do
-    List.foldl(formatables, 0, &(max(String.length(Format.format(&1)), &2)))
-  end
-
-  defp get_column_widths(formatables, max_width) do
-    formatable_column_width = get_formatable_max_width(formatables)
-    probable_help_column_width = max_width - @left_pading - @separaion_padding - formatable_column_width
-    if probable_help_column_width > formatable_column_width do # expected case, have many space for help column
-      {:ok, [@left_pading, formatable_column_width, @separaion_padding, probable_help_column_width]}
-    else
-      :not_enough_space
-    end
   end
 
 end

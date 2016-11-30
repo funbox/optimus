@@ -8,8 +8,6 @@ defmodule Optimus.Title do
     ]
     lines
     |> List.flatten
-    |> Enum.map(&"#{&1}\n")
-    |> Enum.join
   end
 
   def find_title_info(optimus, []), do: {optimus.author, optimus.description, optimus.version, optimus.about}
@@ -24,7 +22,7 @@ defmodule Optimus.Title do
     }
   end
 
-  def line(items) do
+  defp line(items) do
     case Enum.filter(items, &(&1)) do
       [] -> []
       list -> Enum.join(list, " ")

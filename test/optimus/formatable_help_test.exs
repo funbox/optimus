@@ -1,13 +1,9 @@
-defmodule Optimus.HelpTest do
+defmodule Optimus.FormatableHelpTest do
   use ExUnit.Case
 
   def optimus do
     {:ok, optimus} = Optimus.new(
       name: "awesome",
-      description: "Elixir App",
-      version: "1.0.1",
-      author: "Averyanov Ilya av@fun-box.ru",
-      about: "Does awesome things",
       args: [
         first: [
           value_name: "FIRST",
@@ -46,30 +42,14 @@ defmodule Optimus.HelpTest do
           help: "Help Help me if you can, I'm feeling down And I do appreciate you being 'round Help me get my feet back on the ground Won't you please, please help me?"
         ],
       ],
-      subcommands: [
-        subcommand: [
-          name: "subcommand",
-          description: "Elixir App",
-          about: "Help Help me if you can, I'm feeling down And I do appreciate you being 'round Help me get my feet back on the ground Won't you please, please help me?",
-          allow_unknown_args: false,
-          parse_double_dash: false,
-          args: [first: []],
-          flags: [first: [short: "-f"]],
-          options: [first: [short: "-o", parser: :integer]]
-        ]
-      ]
     )
     optimus
   end
 
-  test "full help" do
-    assert [
-      "Elixir App 1.0.1",
-      "Averyanov Ilya av@fun-box.ru",
-      "Does awesome things",
-      "",
-      "USAGE:",
-      "    awesome [--first-flag] [-s] [-o FIRST_OPTION] [--second-option SECOND_OPTION] FIRST SECOND THIRD", "",
+  test "arg column help" do
+    help = Optimus.FormatableHelp.formatable_help("ARGS:", optimus.args, 80)
+
+    assert help == [
       "ARGS:",
       "",
       "    FIRST         Help Help me if you can, I'm feeling down And I do appreciate ",
@@ -80,17 +60,26 @@ defmodule Optimus.HelpTest do
       "                  you please, please help me?                                   ",
       "    THIRD         Help Help me if you can, I'm feeling down And I do appreciate ",
       "                  you being 'round Help me get my feet back on the ground Won't ",
-      "                  you please, please help me?                                   ",
+      "                  you please, please help me?                                   "
+    ]
+  end
+
+  test "arg simple help" do
+    help = Optimus.FormatableHelp.formatable_help("ARGS:", optimus.args, 10)
+    assert help == [
+      "ARGS:",
       "",
-      "FLAGS:",
-      "",
-      "    -f, --first-flag        Help Help me if you can, I'm feeling down And I do  ",
-      "                            appreciate you being 'round Help me get my feet back",
-      "                            on the ground Won't you please, please help me?     ",
-      "    -s                      Help Help me if you can, I'm feeling down And I do  ",
-      "                            appreciate you being 'round Help me get my feet back",
-      "                            on the ground Won't you please, please help me?     ",
-      "",
+      "FIRST: Help Help me if you can, I'm feeling down And I do appreciate you being 'round Help me get my feet back on the ground Won't you please, please help me?",
+      "SECOND: Help Help me if you can, I'm feeling down And I do appreciate you being 'round Help me get my feet back on the ground Won't you please, please help me?",
+      "THIRD: Help Help me if you can, I'm feeling down And I do appreciate you being 'round Help me get my feet back on the ground Won't you please, please help me?"
+    ]
+  end
+
+
+  test "options column help" do
+    help = Optimus.FormatableHelp.formatable_help("OPTIONS:", optimus.options, 80)
+
+    assert help == [
       "OPTIONS:",
       "",
       "    -o                         Help Help me if you can, I'm feeling down And I  ",
@@ -101,12 +90,46 @@ defmodule Optimus.HelpTest do
       "                               do appreciate you being 'round Help me get my    ",
       "                               feet back on the ground Won't you please, please ",
       "                               help me?                                         ",
-      "",
-      "SUBCOMMANDS:",
-      "",
-      "    subcommand        Help Help me if you can, I'm feeling down And I do        ",
-      "                      appreciate you being 'round Help me get my feet back on   ",
-      "                      the ground Won't you please, please help me?              "
-    ] == Optimus.Help.help(optimus, [], 80)
+    ]
   end
+
+  test "options simple help" do
+    help = Optimus.FormatableHelp.formatable_help("OPTIONS:", optimus.options, 10)
+
+    assert help == [
+      "OPTIONS:",
+      "",
+      "-o: Help Help me if you can, I'm feeling down And I do appreciate you being 'round Help me get my feet back on the ground Won't you please, please help me?",
+      "-t, --second-option: Help Help me if you can, I'm feeling down And I do appreciate you being 'round Help me get my feet back on the ground Won't you please, please help me?"
+    ]
+  end
+
+
+  test "flag column help" do
+    help = Optimus.FormatableHelp.formatable_help("FLAGS:", optimus.flags, 80)
+
+    assert help == [
+      "FLAGS:",
+      "",
+      "    -f, --first-flag        Help Help me if you can, I'm feeling down And I do  ",
+      "                            appreciate you being 'round Help me get my feet back",
+      "                            on the ground Won't you please, please help me?     ",
+      "    -s                      Help Help me if you can, I'm feeling down And I do  ",
+      "                            appreciate you being 'round Help me get my feet back",
+      "                            on the ground Won't you please, please help me?     ",
+    ]
+  end
+
+  test "flag simple help" do
+    help = Optimus.FormatableHelp.formatable_help("FLAGS:", optimus.flags, 10)
+
+    assert help == [
+      "FLAGS:",
+      "",
+      "-f, --first-flag: Help Help me if you can, I'm feeling down And I do appreciate you being 'round Help me get my feet back on the ground Won't you please, please help me?",
+      "-s: Help Help me if you can, I'm feeling down And I do appreciate you being 'round Help me get my feet back on the ground Won't you please, please help me?"
+    ]
+  end
+
+
 end
