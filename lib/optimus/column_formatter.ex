@@ -93,11 +93,8 @@ defmodule Optimus.ColumnFormatter do
     end
   end
 
-  defp spaces(len) when is_integer(len) and len <= 0, do: ""
-  defp spaces(len) when is_integer(len) and len > 0 do
-    space_list = for _ <- 1..len, do: " "
-    Enum.join(space_list)
-  end
+  defp spaces(len) when is_integer(len) and len < 0, do: ""
+  defp spaces(len) when is_integer(len) and len >= 0, do: String.duplicate(" ", len)
 
   defp heads_and_rests([], heads, rests), do: {Enum.reverse(heads), Enum.reverse(rests)}
   defp heads_and_rests([{spec, [string_head | string_rest]}| rest], heads, rests) do
