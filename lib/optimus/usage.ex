@@ -11,6 +11,18 @@ defmodule Optimus.Usage do
     |> Enum.join(" ")
   end
 
+  def help_usage(optimus) do
+    optimus.name <> " --help"
+  end
+
+  def version_usage(optimus) do
+    optimus.name <> " --version"
+  end
+
+  def subcomand_help_usage(optimus) do
+    optimus.name <> " help subcommand"
+  end
+
   defp format_usage(formatables) do
     formatables
     |> Enum.map(&Optimus.Format.format_in_usage(&1))

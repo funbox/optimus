@@ -3,7 +3,7 @@ defmodule Optimus.Help do
   def help(optimus, subcommand_path, max_width) do
 
     title = Optimus.Title.title(optimus, subcommand_path)
-    usage = Optimus.Usage.usage(optimus, subcommand_path)
+    usage = usage(optimus, subcommand_path)
 
     {subcommand, _} = Optimus.fetch_subcommand(optimus, subcommand_path)
 
@@ -11,8 +11,32 @@ defmodule Optimus.Help do
     |> nonempty_formatables
     |> formatable_help(max_width)
 
-    title ++ ["", "USAGE:", "    " <> usage, ""] ++ formatable_help
+    title ++ usage ++ formatable_help
 
+  end
+
+  defp usage(optimus, []) do
+    List.flatten([
+      "",
+      "USAGE:",
+      "    #{Optimus.Usage.usage(optimus)}",
+      "    #{Optimus.Usage.version_usage(optimus)}",
+      "    #{Optimus.Usage.help_usage(optimus)}",
+      case optimus.subcommands do
+        [] -> []
+        _ -> "    #{Optimus.Usage.subcomand_help_usage(optimus)}"
+      end,
+      ""
+    ])
+  end
+
+  defp usage(optimus, subcommand_path) do
+    [
+      "",
+      "USAGE:",
+      "    #{Optimus.Usage.usage(optimus, subcommand_path)}",
+      ""
+    ]
   end
 
   defp subcommand_formatables(subcommand) do

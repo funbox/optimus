@@ -69,7 +69,11 @@ defmodule Optimus.HelpTest do
       "Does awesome things",
       "",
       "USAGE:",
-      "    awesome [--first-flag] [-s] [-o FIRST_OPTION] [--second-option SECOND_OPTION] FIRST SECOND THIRD", "",
+      "    awesome [--first-flag] [-s] [-o FIRST_OPTION] [--second-option SECOND_OPTION] FIRST SECOND THIRD",
+      "    awesome --version",
+      "    awesome --help",
+      "    awesome help subcommand",
+      "",
       "ARGS:",
       "",
       "    FIRST         Help Help me if you can, I'm feeling down And I do appreciate ",
@@ -107,6 +111,6 @@ defmodule Optimus.HelpTest do
       "    subcommand        Help Help me if you can, I'm feeling down And I do        ",
       "                      appreciate you being 'round Help me get my feet back on   ",
       "                      the ground Won't you please, please help me?              "
-    ] == Optimus.Help.help(optimus, [], 80)
+      ] == Optimus.Help.help(optimus, [], 80)
   end
 end

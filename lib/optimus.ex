@@ -56,6 +56,7 @@ defmodule Optimus do
 
   def parse(optimus, command_line) do
     with :ok <- validate_command_line(command_line),
+    :ok <- parse_specials(optimus, command_line),
     {sub_optimus, subcommand_path, sub_command_line} <- find_subcommand(optimus, [], command_line),
     {parsed, errors, unknown} <- parse_all_kinds({sub_optimus.options, sub_optimus.flags, sub_optimus.args}, %{}, sub_command_line, [], []),
     errors_with_unknown <- validate_unknown(sub_optimus, unknown, errors),
@@ -63,9 +64,29 @@ defmodule Optimus do
     do: parse_result(sub_optimus, subcommand_path, parsed, unknown, all_errors)
   end
 
+  defp parse_specials(_, ["--version"]), do: :version
+  defp parse_specials(_, ["--help"]), do: :help
+  defp parse_specials(optimus, ["help" | subcommand]) do
+    case find_exact_subcommand(optimus, subcommand) do
+      [_ | _] = subcommand_path -> {:help, subcommand_path}
+      _ -> {:error, "invalid subcommand: #{Enum.join(subcommand, " ")}"}
+    end
+  end
+  defp parse_specials(_, _), do: :ok
+
+  defp find_exact_subcommand(optimus, subcommand, subcommand_path \\ [])
+  defp find_exact_subcommand(_, [], found_path), do: Enum.reverse(found_path)
+  defp find_exact_subcommand(optimus, [name | rest], found_path) do
+    case Enum.find(optimus.subcommands, &(name == &1.name)) do
+      %Optimus{subcommand: subcommand} = sub_optimus ->
+        find_exact_subcommand(sub_optimus, rest, [subcommand | found_path])
+      _ -> :error
+    end
+  end
+
   def fetch_subcommand(optimus, subcommand_path), do: fetch_subcommand(optimus, subcommand_path, [optimus.name])
-  defp fetch_subcommand(optimus, [], subcommand_name), do: {optimus, Enum.reverse(subcommand_name)}
-  defp fetch_subcommand(optimus, [subcommand_id | subcommand_path], subcommand_name) do
+  def fetch_subcommand(optimus, [], subcommand_name), do: {optimus, Enum.reverse(subcommand_name)}
+  def fetch_subcommand(optimus, [subcommand_id | subcommand_path], subcommand_name) do
     subcommand = Enum.find(optimus.subcommands, &(subcommand_id == &1.subcommand))
     fetch_subcommand(subcommand, subcommand_path, [subcommand.name | subcommand_name])
   end

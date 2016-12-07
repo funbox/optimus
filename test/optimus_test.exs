@@ -605,4 +605,37 @@ defmodule OptimusTest do
     assert "o" == parsed.options[:first]
   end
 
+  test "parse: --version" do
+    {:ok, optimus} = Optimus.new([])
+    assert :version == Optimus.parse(optimus, ~w{--version})
+  end
+
+  test "parse: --help" do
+    {:ok, optimus} = Optimus.new([])
+    assert :help == Optimus.parse(optimus, ~w{--help})
+  end
+
+  test "parse: help" do
+    {:ok, optimus} = Optimus.new([
+      subcommands: [
+        sub: [
+          name: "sub"
+        ]
+      ]
+    ])
+    assert {:help, [:sub]} == Optimus.parse(optimus, ~w{help sub})
+  end
+
+  test "parse: invalid help" do
+    {:ok, optimus} = Optimus.new([
+      subcommands: [
+        sub: [
+          name: "sub"
+        ]
+      ]
+    ])
+    assert {:error, _} = Optimus.parse(optimus, ~w{help subinvalid})
+  end
+
+
 end
