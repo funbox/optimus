@@ -249,7 +249,7 @@ defmodule Optimus do
     end
   end
 
-  defp validate_required(optimus, parsed, errors) do
+  defp validate_required(optimus, parsed, []) do
     missing_required_args = optimus.args
     |> Enum.reject(&Map.has_key?(parsed, {:arg, &1.name}))
     |> Enum.filter(&(&1.required))
@@ -270,8 +270,9 @@ defmodule Optimus do
       _ -> ["missing required options: #{missing_required_options |> Enum.join(", ")}"]
     end
 
-    required_arg_error ++ required_option_error ++ errors
+    required_arg_error ++ required_option_error
   end
+  defp validate_required(_optimus, _parsed, errors), do: errors
 
   defp parse_result(optimus, subcommand_path, parsed, unknown, []) do
     args = optimus.args

@@ -6,7 +6,9 @@ defmodule Optimus.Errors do
     ++ [ "",
       "Try",
       "    #{optimus.name} --help",
-      "to see available options"
+      "",
+      "to see available options",
+      ""
     ]
   end
 
