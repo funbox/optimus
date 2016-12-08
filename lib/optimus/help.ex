@@ -12,7 +12,6 @@ defmodule Optimus.Help do
     |> formatable_help(max_width)
 
     title ++ usage ++ formatable_help
-
   end
 
   defp usage(optimus, []) do

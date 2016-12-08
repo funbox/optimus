@@ -79,6 +79,40 @@ defmodule Optimus do
     do: parse_result(sub_optimus, subcommand_path, parsed, unknown, all_errors)
   end
 
+  @spec parse!(t, [String.t]) :: ParseResult.t | {subcommand_path, ParseResult.t} | no_return
+
+  def parse!(optimus, command_line) do
+    case parse(optimus, command_line) do
+      {:ok, parse_result} -> parse_result
+      {:ok, subcommand_path, parse_result} -> {subcommand_path, parse_result}
+      {:error, errors} ->
+        optimus |> Optimus.Errors.format(errors) |> put_lines
+        System.halt(-1)
+      :version ->
+        optimus |> Optimus.Title.title  |> put_lines
+        System.halt(0)
+      :help ->
+        optimus |> Optimus.Help.help([], columns) |> put_lines
+        System.halt(0)
+      {:help, subcommand_path} ->
+        optimus |> Optimus.Help.help(subcommand_path, columns) |> put_lines
+        System.halt(0)
+    end
+  end
+
+  defp columns do
+    case :io.columns do
+      {:ok, width} -> width
+      _ -> 1
+    end
+  end
+
+  defp put_lines(lines) do
+    lines
+    |> Enum.map(&[&1, "\n"])
+    |> Enum.map(&IO.puts/1)
+  end
+
   defp parse_specials(_, ["--version"]), do: :version
   defp parse_specials(_, ["--help"]), do: :help
   defp parse_specials(optimus, ["help" | subcommand]) do
