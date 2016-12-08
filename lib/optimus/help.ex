@@ -11,7 +11,7 @@ defmodule Optimus.Help do
     |> nonempty_formatables
     |> formatable_help(max_width)
 
-    title ++ usage ++ formatable_help
+    title ++ usage ++ formatable_help ++ [""]
   end
 
   defp usage(optimus, []) do
@@ -49,7 +49,7 @@ defmodule Optimus.Help do
 
   defp nonempty_formatables(formatables_with_titles) do
     formatables_with_titles
-    |> Enum.reject(fn {_, list} ->  is_nil(list) end)
+    |> Enum.reject(fn {_, list} -> is_nil(list) || list == [] end)
   end
 
   defp formatable_help(formatables_with_titles, max_width) do

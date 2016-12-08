@@ -37,7 +37,10 @@ defmodule Optimus do
       options: %{},
       unknown: []
     ]
+  end
 
+  defmodule OptimusConfigurationError do
+    defexception message: "invalid optimus configuration"
   end
 
   @type parser_result :: {:error, String.t} | {:ok, term}
@@ -66,6 +69,14 @@ defmodule Optimus do
     |> Optimus.Builder.build
   end
 
+  @spec new!(spec) :: t | no_return
+  def new!(props) do
+    case new(props) do
+      {:ok, optimus} -> optimus
+      {:error, errors} -> raise OptimusConfigurationError, message: "invalid optimus configuration: #{Enum.join(errors, "; ")}"
+    end
+  end
+
   @type subcommand_path :: [atom]
 
   @spec parse(t, [String.t]) :: {:ok, ParseResult.t} | {:ok, subcommand_path, ParseResult.t} | {:error, [error]} | :version | :help | {:help, subcommand_path}
@@ -87,7 +98,7 @@ defmodule Optimus do
       {:ok, subcommand_path, parse_result} -> {subcommand_path, parse_result}
       {:error, errors} ->
         optimus |> Optimus.Errors.format(errors) |> put_lines
-        System.halt(-1)
+        System.halt(1)
       :version ->
         optimus |> Optimus.Title.title  |> put_lines
         System.halt(0)
@@ -103,13 +114,12 @@ defmodule Optimus do
   defp columns do
     case :io.columns do
       {:ok, width} -> width
-      _ -> 1
+      _ -> 80
     end
   end
 
   defp put_lines(lines) do
     lines
-    |> Enum.map(&[&1, "\n"])
     |> Enum.map(&IO.puts/1)
   end
 

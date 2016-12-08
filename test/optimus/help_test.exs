@@ -110,7 +110,7 @@ defmodule Optimus.HelpTest do
       "",
       "    subcommand        Help Help me if you can, I'm feeling down And I do        ",
       "                      appreciate you being 'round Help me get my feet back on   ",
-      "                      the ground Won't you please, please help me?              "
-      ] == Optimus.Help.help(optimus, [], 80)
+      "                      the ground Won't you please, please help me?              ",
+      "" ] == Optimus.Help.help(optimus, [], 80)
   end
 end
