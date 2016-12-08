@@ -20,12 +20,24 @@ defmodule Optimus do
   ]
 
   defmodule ParseResult do
+    @type arg_value :: term
+    @type flag_value :: boolean | pos_integer
+    @type option_value :: term | [term]
+
+    @type t :: %ParseResult{
+      args: %{optional(atom) => arg_value},
+      flags: %{optional(atom) => flag_value},
+      options: %{optional(atom) => option_value},
+      unknown: [String.t]
+    }
+
     defstruct [
       args: %{},
       flags: %{},
       options: %{},
       unknown: []
     ]
+
   end
 
   @type parser_result :: {:error, String.t} | {:ok, term}
@@ -45,15 +57,18 @@ defmodule Optimus do
   @type spec :: [spec_item]
 
   @type error :: String.t
-  @opaque optimus :: %Optimus{}
+  @opaque t :: %Optimus{}
 
-  @spec new(spec) :: {:ok, optimus} | {:error, [error]}
+  @spec new(spec) :: {:ok, t} | {:error, [error]}
   def new(props) do
     props
     |> set_default_name
     |> Optimus.Builder.build
   end
 
+  @type subcommand_path :: [atom]
+
+  @spec parse(t, [String.t]) :: {:ok, ParseResult.t} | {:ok, subcommand_path, ParseResult.t} | {:error, [error]} | :version | :help | {:help, subcommand_path}
   def parse(optimus, command_line) do
     with :ok <- validate_command_line(command_line),
     :ok <- parse_specials(optimus, command_line),
@@ -69,7 +84,7 @@ defmodule Optimus do
   defp parse_specials(optimus, ["help" | subcommand]) do
     case find_exact_subcommand(optimus, subcommand) do
       [_ | _] = subcommand_path -> {:help, subcommand_path}
-      _ -> {:error, "invalid subcommand: #{Enum.join(subcommand, " ")}"}
+      _ -> {:error, ["invalid subcommand: #{Enum.join(subcommand, " ")}"]}
     end
   end
   defp parse_specials(_, _), do: :ok
