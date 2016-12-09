@@ -58,7 +58,7 @@ defmodule Optimus.PropertyParsers do
 
   def build_short(_name, nil), do: {:ok, nil}
   def build_short(name, value) when is_binary(value) do
-    trimmed_value = String.trim_leading(value, "-")
+    trimmed_value = String.replace(value, ~r{\A[\-]+}, "")
     if trimmed_value =~ ~r{\A[A-Za-z]\z} do
       {:ok, "-" <> trimmed_value}
     else
@@ -69,7 +69,7 @@ defmodule Optimus.PropertyParsers do
 
   def build_long(_name, nil), do: {:ok, nil}
   def build_long(name, value) when is_binary(value)  do
-    trimmed_value = String.trim_leading(value, "-")
+    trimmed_value = String.replace(value, ~r{\A[\-]+}, "")
     if trimmed_value =~ ~r{\A[^\s]+\z} do
       {:ok, "--" <> trimmed_value}
     else
