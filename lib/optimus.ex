@@ -25,9 +25,9 @@ defmodule Optimus do
     @type option_value :: term | [term]
 
     @type t :: %ParseResult{
-      args: %{optional(atom) => arg_value},
-      flags: %{optional(atom) => flag_value},
-      options: %{optional(atom) => option_value},
+      args: %{atom => arg_value},
+      flags: %{atom => flag_value},
+      options: %{atom => option_value},
       unknown: [String.t]
     }
 
