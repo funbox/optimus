@@ -82,4 +82,4 @@ Optimus.new!([
       options: [first: [short: "-o", parser: :integer]]
     ]
   ]
-]) |> Optimus.parse!(System.argv) |> Apex.ap
+]) |> Optimus.parse!(System.argv) |> IO.inspect 

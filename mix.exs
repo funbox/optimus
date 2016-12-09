@@ -42,7 +42,6 @@ defmodule Optimus.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:apex, "~> 0.6.0", only: [:dev, :test]},
       {:dialyxir, "~> 0.4", only: :dev},
       {:excoveralls, "~> 0.5", only: :test}
     ]
