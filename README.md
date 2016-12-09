@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/savonarola/optimus.svg?branch=master)](https://travis-ci.org/savonarola/optimus)
+
 # Optimus
 
 **TODO: Add description**
@@ -21,4 +23,3 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
       [applications: [:optimus]]
     end
     ```
-
