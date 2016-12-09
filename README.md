@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/savonarola/optimus.svg?branch=master)](https://travis-ci.org/savonarola/optimus)
+[![Coverage Status](https://coveralls.io/repos/github/savonarola/optimus/badge.svg?branch=master)](https://coveralls.io/github/savonarola/optimus?branch=master)
 
 # Optimus
 
