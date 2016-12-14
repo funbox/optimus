@@ -35,6 +35,6 @@ defimpl Optimus.Format, for: Optimus.Arg do
     end
   end
 
-  def help(arg), do: arg.help
+  def help(arg), do: arg.help || ""
 
 end

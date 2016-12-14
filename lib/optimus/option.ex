@@ -67,6 +67,6 @@ defimpl Optimus.Format, for: Optimus.Option do
     end
   end
 
-  def help(option), do: option.help
+  def help(option), do: option.help || ""
 
 end

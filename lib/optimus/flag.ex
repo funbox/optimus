@@ -57,6 +57,6 @@ defimpl Optimus.Format, for: Optimus.Flag do
     "[#{flag_name}]"
   end
 
-  def help(flag), do: flag.help
+  def help(flag), do: flag.help || ""
 
 end

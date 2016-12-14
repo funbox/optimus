@@ -73,7 +73,7 @@ defmodule Optimus do
   def new!(props) do
     case new(props) do
       {:ok, optimus} -> optimus
-      {:error, errors} -> raise OptimusConfigurationError, message: "invalid optimus configuration: #{Enum.join(errors, "; ")}"
+      {:error, error} -> raise OptimusConfigurationError, message: "invalid optimus configuration: #{error}"
     end
   end
 
@@ -308,6 +308,6 @@ defimpl Optimus.Format, for: Optimus do
   def format_in_error(optimus), do: optimus.name
   def format_in_usage(optimus), do: optimus.name
 
-  def help(optimus), do: optimus.about
+  def help(optimus), do: optimus.about || ""
 
 end
