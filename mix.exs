@@ -32,7 +32,8 @@ defmodule Optimus.Mixfile do
   defp deps do
     [
       {:dialyxir, "~> 0.4", only: :dev},
-      {:excoveralls, "~> 0.5", only: :test}
+      {:excoveralls, "~> 0.5", only: :test},
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 
@@ -42,7 +43,8 @@ defmodule Optimus.Mixfile do
       files: ["lib", "mix.exs", "README*", "LICENSE*"],
       maintainers: ["Ilya Averyanov"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/savonarola/optimus"}
+      links: %{"GitHub" => "https://github.com/savonarola/optimus"},
+      description: "Command line option parser inspired by clap.rs"
     ]
   end
 end
