@@ -20,8 +20,9 @@ defmodule Optimus.Mixfile do
         plt_add_deps: true,
         plt_add_apps: [:ssl],
         flags: ["-Werror_handling", "-Wrace_conditions"],
-      ]
-   ]
+      ],
+      package: package()
+    ]
   end
 
   def application do
@@ -32,6 +33,16 @@ defmodule Optimus.Mixfile do
     [
       {:dialyxir, "~> 0.4", only: :dev},
       {:excoveralls, "~> 0.5", only: :test}
+    ]
+  end
+
+  defp package do
+    [
+      name: :optimus,
+      files: ["lib", "mix.exs", "README*", "LICENSE*"],
+      maintainers: ["Ilya Averyanov"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/savonarola/optimus"}
     ]
   end
 end
