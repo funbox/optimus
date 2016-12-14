@@ -12,7 +12,7 @@ ready to use values.
 
 `Optimus` was strongly inspired by the awesome [`clap.rs`](https://clap.rs/)
 library. `Optimus` does not generally follows its design, but it tries to
-follow the idea of zero manual manipulation of the values after the parser has
+follow the idea of zero manual manipulation with the values after the parser has
 returned them.
 
 ## Installation
