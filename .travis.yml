@@ -1,5 +1,6 @@
 language: elixir
 elixir:
-- 1.3.4
+  - 1.3.4
+  - 1.4.0
 script:
-- env MIX_ENV=test mix coveralls.travis
+  - env MIX_ENV=test mix coveralls.travis
