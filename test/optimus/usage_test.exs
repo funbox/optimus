@@ -54,11 +54,11 @@ defmodule Optimus.UsageTest do
   end
 
   test "usage: main command" do
-    assert Usage.usage(optimus) == "awesome [--first-flag] [-s] [-o FIRST_OPTION] --second-option SECOND_OPTION FIRST [SECOND] [THIRD]"
+    assert Usage.usage(optimus()) == "awesome [--first-flag] [-s] [-o FIRST_OPTION] --second-option SECOND_OPTION FIRST [SECOND] [THIRD]"
   end
 
   test "usage: subcommand" do
-    assert Usage.usage(optimus, [:subcommand]) == "awesome subcommand [-f] [-o FIRST] FIRST"
+    assert Usage.usage(optimus(), [:subcommand]) == "awesome subcommand [-f] [-o FIRST] FIRST"
   end
 
 

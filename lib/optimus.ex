@@ -103,10 +103,10 @@ defmodule Optimus do
         optimus |> Optimus.Title.title  |> put_lines
         System.halt(0)
       :help ->
-        optimus |> Optimus.Help.help([], columns) |> put_lines
+        optimus |> Optimus.Help.help([], columns()) |> put_lines
         System.halt(0)
       {:help, subcommand_path} ->
-        optimus |> Optimus.Help.help(subcommand_path, columns) |> put_lines
+        optimus |> Optimus.Help.help(subcommand_path, columns()) |> put_lines
         System.halt(0)
     end
   end
