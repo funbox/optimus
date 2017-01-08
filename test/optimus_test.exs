@@ -360,7 +360,7 @@ defmodule OptimusTest do
   ]
 
   test "test full valid config" do
-    assert {:ok, _} = Optimus.new(full_valid_config)
+    assert {:ok, _} = Optimus.new(full_valid_config())
   end
 
   test "parse: check format for arg" do
@@ -516,7 +516,7 @@ defmodule OptimusTest do
   end
 
   test "parse: full configuration" do
-    assert {:ok, optimus} = Optimus.new(full_valid_config)
+    assert {:ok, optimus} = Optimus.new(full_valid_config())
     command_line = ~w{123 AA -f --second-flag -s -o 123 --second-option DD -- thirdthird --fourth}
     assert {:ok, _} = Optimus.parse(optimus, command_line)
   end
