@@ -12,6 +12,19 @@ defmodule Optimus.Errors do
     ]
   end
 
+  def format(optimus, subcommand_path, errors) do
+    {_subcommand, [_ | subcommand_name]} = Optimus.fetch_subcommand(optimus, subcommand_path)
+    ["The following errors occured:"]
+    ++ format_errors(errors)
+    ++ [ "",
+      "Try",
+      "    #{optimus.name} help #{Enum.join(subcommand_name, " ")}",
+      "",
+      "to see available options",
+      ""
+    ]
+  end
+
   def format_errors(errors) do
     Enum.map(
       errors,

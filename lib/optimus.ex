@@ -79,7 +79,7 @@ defmodule Optimus do
 
   @type subcommand_path :: [atom]
 
-  @spec parse(t, [String.t]) :: {:ok, ParseResult.t} | {:ok, subcommand_path, ParseResult.t} | {:error, [error]} | :version | :help | {:help, subcommand_path}
+  @spec parse(t, [String.t]) :: {:ok, ParseResult.t} | {:ok, subcommand_path, ParseResult.t} | {:error, [error]} | {:error, subcommand_path, [error]} | :version | :help | {:help, subcommand_path}
   def parse(optimus, command_line) do
     with :ok <- validate_command_line(command_line),
     :ok <- parse_specials(optimus, command_line),
@@ -90,24 +90,27 @@ defmodule Optimus do
     do: parse_result(sub_optimus, subcommand_path, parsed, unknown, all_errors)
   end
 
-  @spec parse!(t, [String.t]) :: ParseResult.t | {subcommand_path, ParseResult.t} | no_return
+  @spec parse!(t, [String.t], (integer -> no_return)) :: ParseResult.t | {subcommand_path, ParseResult.t} | no_return
 
-  def parse!(optimus, command_line) do
+  def parse!(optimus, command_line, halt \\ &System.halt/1) do
     case parse(optimus, command_line) do
       {:ok, parse_result} -> parse_result
       {:ok, subcommand_path, parse_result} -> {subcommand_path, parse_result}
       {:error, errors} ->
         optimus |> Optimus.Errors.format(errors) |> put_lines
-        System.halt(1)
+        halt.(1)
+      {:error, subcommand_path, errors} ->
+        optimus |> Optimus.Errors.format(subcommand_path, errors) |> put_lines
+        halt.(1)
       :version ->
         optimus |> Optimus.Title.title  |> put_lines
-        System.halt(0)
+        halt.(0)
       :help ->
         optimus |> Optimus.Help.help([], columns()) |> put_lines
-        System.halt(0)
+        halt.(0)
       {:help, subcommand_path} ->
         optimus |> Optimus.Help.help(subcommand_path, columns()) |> put_lines
-        System.halt(0)
+        halt.(0)
     end
   end
 

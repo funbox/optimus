@@ -1,6 +1,8 @@
 defmodule OptimusTest do
   use ExUnit.Case
 
+  import ExUnit.CaptureIO
+
   test "minimal" do
     assert {:ok, _} = Optimus.new([])
   end
@@ -635,6 +637,35 @@ defmodule OptimusTest do
       ]
     ])
     assert {:error, _} = Optimus.parse(optimus, ~w{help subinvalid})
+  end
+
+  test "parse! with valid subcommand args" do
+    {:ok, optimus} = Optimus.new([
+      subcommands: [
+        sub: [
+          name: "sub",
+          allow_unknown_args: false
+        ]
+      ]
+    ])
+    assert {[:sub], %Optimus.ParseResult{}} = Optimus.parse!(optimus, ~w{sub})
+  end
+
+  test "parse! with invalid subcommand args" do
+    {:ok, optimus} = Optimus.new([
+      subcommands: [
+        sub: [
+          name: "sub",
+          allow_unknown_args: false
+        ]
+      ]
+    ])
+
+    halt = fn(val) -> {:halt, val} end
+
+    capture_io fn ->
+      assert {:halt, 1} == Optimus.parse!(optimus, ~w{sub unknown}, halt)
+    end
   end
 
 
