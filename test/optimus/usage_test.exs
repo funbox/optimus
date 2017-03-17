@@ -61,5 +61,26 @@ defmodule Optimus.UsageTest do
     assert Usage.usage(optimus(), [:subcommand]) == "awesome subcommand [-f] [-o FIRST] FIRST"
   end
 
+  test "usage: unknown args" do
+    {:ok, optimus} = Optimus.new(
+      name: "awesome",
+      allow_unknown_args: true,
+      args: [
+        first: [
+          value_name: "FIRST",
+          required: true
+        ],
+        second: [
+          value_name: "SECOND",
+          required: false
+        ],
+        third: [
+          value_name: "THIRD",
+          required: false
+        ]
+      ]
+    )
+    assert Usage.usage(optimus) == "awesome FIRST [SECOND] [THIRD] ..."
+  end
 
 end
