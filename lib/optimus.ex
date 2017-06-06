@@ -114,6 +114,12 @@ defmodule Optimus do
     end
   end
 
+  def help(optimus) do
+    optimus
+    |> Optimus.Help.help([], columns())
+    |> Enum.join("\n")
+  end
+
   defp columns do
     case :io.columns do
       {:ok, width} -> width

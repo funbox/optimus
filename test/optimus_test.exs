@@ -668,5 +668,15 @@ defmodule OptimusTest do
     end
   end
 
+  test "help" do
+    {:ok, optimus} = Optimus.new([
+      subcommands: [
+        sub: [
+          name: "sub"
+        ]
+      ]
+    ])
+    assert is_binary(Optimus.help(optimus))
+  end
 
 end
