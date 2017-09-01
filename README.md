@@ -224,6 +224,15 @@ which are maps, and `unknown`, which is a list. Things to note are:
 * for flags with `multiple: true` the value is an integer (representing the
   number of occurences of a flag).
 
+One can load `Optimus` configuration from a YAML file:
+
+```elixir
+optimus = Optimus.from_yaml!("path/to/config.yaml")
+```
+
+But in this case custom parsers are obviously unavailable.
+
+
 ## Credits
 
 * [José Valim](https://github.com/josevalim) and all other creators of [`Elixir`](http://elixir-lang.org)

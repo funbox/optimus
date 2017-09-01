@@ -31,9 +31,10 @@ defmodule Optimus.Mixfile do
 
   defp deps do
     [
-      {:dialyxir, "~> 0.4", only: :dev},
-      {:excoveralls, "~> 0.5", only: :test},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:dialyxir, ">= 0.0.0", only: :dev},
+      {:excoveralls, ">= 0.0.0", only: :test},
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:yamerl, "~> 0.4.0"}
     ]
   end
 

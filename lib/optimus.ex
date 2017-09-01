@@ -77,6 +77,20 @@ defmodule Optimus do
     end
   end
 
+  @spec from_yaml(filename :: String.t) :: {:ok, t} | {:error, error}
+  def from_yaml(filename) do
+    with {:ok, spec} <- Optimus.YamlLoader.load(filename),
+    do: new(spec)
+  end
+
+  @spec from_yaml(filename :: String.t) ::  t | no_return
+  def from_yaml!(filename) do
+    case from_yaml(filename) do
+      {:ok, optimus} -> optimus
+      {:error, error} -> raise OptimusConfigurationError, message: "invalid optimus configuration: #{inspect error}"
+    end
+  end
+
   @type subcommand_path :: [atom]
 
   @spec parse(t, [String.t]) :: {:ok, ParseResult.t} | {:ok, subcommand_path, ParseResult.t} | {:error, [error]} | {:error, subcommand_path, [error]} | :version | :help | {:help, subcommand_path}
