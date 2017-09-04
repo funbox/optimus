@@ -1,6 +1,10 @@
 [![Build Status](https://travis-ci.org/savonarola/optimus.svg?branch=master)](https://travis-ci.org/savonarola/optimus)
 [![Coverage Status](https://coveralls.io/repos/github/savonarola/optimus/badge.svg?branch=master)](https://coveralls.io/github/savonarola/optimus?branch=master)
 
+<a href="https://funbox.ru">
+  <img src="http://funbox.ru/badges/sponsored_by_funbox.svg" alt="Sponsored by FunBox" width=250 />
+</a>
+
 # Optimus
 
 `Optimus` is a command line parsing library for [`Elixir`](http://elixir-lang.org).
