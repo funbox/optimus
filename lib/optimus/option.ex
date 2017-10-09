@@ -15,22 +15,51 @@ defmodule Optimus.Option do
     Optimus.Option.Builder.build(spec)
   end
 
-  def parse(option, parsed, [item, raw_value | command_line]) do
-    if option.short == item || option.long == item do
-      key = {:option, option.name}
-      if option.multiple || !Map.has_key?(parsed, key) do
-        case option.parser.(raw_value) do
-          {:ok, value} -> {:ok, Map.update(parsed, key, [value], &([value | &1])), command_line}
-          {:error, reason} -> {:error, "invalid value #{inspect raw_value} for #{Optimus.Format.format_in_error(option)} option: #{reason}", command_line}
+  def parse(option, parsed, command_line) when length(command_line) > 0 do
+    case parse_option_parts(option, command_line) do
+      {:ok, raw_value, rest} ->
+        key = {:option, option.name}
+        if option.multiple || !Map.has_key?(parsed, key) do
+          case option.parser.(raw_value) do
+            {:ok, value} -> {:ok, Map.update(parsed, key, [value], &([value | &1])), rest}
+            {:error, reason} -> {:error, "invalid value #{inspect raw_value} for #{Optimus.Format.format_in_error(option)} option: #{reason}", rest}
+          end
+        else
+          {:error, "multiple occurences of option #{Optimus.Format.format_in_error(option)}", rest}
         end
-      else
-        {:error, "multiple occurences of option #{Optimus.Format.format_in_error(option)}", command_line}
-      end
-    else
-      :skip
+      :skip -> :skip
     end
   end
   def parse(_, _, _), do: :skip
+
+  defp parse_option_parts(option, [item | items]) do
+    case extract_value(option, item) do
+      {:ok, value} -> {:ok, value, items}
+      :none ->
+        case items do
+          [value_item | rest] ->
+            if item == option.long or item == option.short do
+              {:ok, value_item, rest}
+            else
+              :skip
+            end
+          _ -> :skip
+        end
+    end
+  end
+
+  defp extract_value(option, str) do
+    if option.long do
+      length = String.length(option.long) + 1
+      if option.long <> "=" == String.slice(str, 0..length-1) do
+        {:ok, String.slice(str, length..-1)}
+      else
+        :none
+      end
+    else
+      :none
+    end
+  end
 
   def try_match([option | options], parsed, items) do
     case parse(option, parsed, items) do

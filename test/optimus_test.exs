@@ -564,9 +564,10 @@ defmodule OptimusTest do
         second: [long: "--second", parser: :float],
         third: [short: "-t", long: "--third", multiple: true, parser: fn(val) -> {:ok, {val}} end],
         fourth: [long: "--fourth", multiple: true, required: false],
-        fifth: [long: "--fifth", required: false]
+        fifth: [long: "--fifth", required: false],
+        sixth: [long: "--sixth", required: true],
     ])
-    command_line = ~w{-f 123 --second 2.5 -t a --third b}
+    command_line = ~w{-f 123 --second 2.5 -t a --third b --sixth=6}
     assert {:ok, parsed} = Optimus.parse(optimus, command_line)
 
     assert 123 == parsed.options[:first]
@@ -574,6 +575,7 @@ defmodule OptimusTest do
     assert [{"a"}, {"b"}] == parsed.options[:third]
     assert [] == parsed.options[:fourth]
     assert nil == parsed.options[:fifth]
+    assert "6" == parsed.options[:sixth]
   end
 
   test "parse: unknown" do
