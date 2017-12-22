@@ -2,14 +2,6 @@ defmodule Optimus.Flag.Builder do
   alias Optimus.Flag
   alias Optimus.PropertyParsers, as: PP
 
-  defstruct [
-    :name,
-    :short,
-    :long,
-    :help,
-    :multiple
-  ]
-
   def build({name, props}) do
     case build_from_props(%Flag{name: name}, props) do
       {:ok, _arg} = res -> res

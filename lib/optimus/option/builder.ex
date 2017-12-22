@@ -2,17 +2,6 @@ defmodule Optimus.Option.Builder do
   alias Optimus.Option
   alias Optimus.PropertyParsers, as: PP
 
-  defstruct [
-    :name,
-    :value_name,
-    :short,
-    :long,
-    :help,
-    :multiple,
-    :required,
-    :parser
-  ]
-
   def build({name, props}) do
     case build_from_props(%Option{name: name}, props) do
       {:ok, _option} = res -> res
