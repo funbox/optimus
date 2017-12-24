@@ -197,13 +197,27 @@ defmodule Optimus do
   defp get_option(parsed, option) do
     case option do
       %Option{multiple: true} ->
+        default_value =
+          if is_nil(option.default) do
+            []
+          else
+            option.default
+          end
+
         parsed
-        |> Map.get({:option, option.name}, [])
+        |> Map.get({:option, option.name}, default_value)
         |> Enum.reverse
       _ ->
-        case Map.get(parsed, {:option, option.name}) do
+        default_value =
+          if is_nil(option.default) do
+            nil
+          else
+            option.default
+          end
+        
+        case Map.get(parsed, {:option, option.name}, default_value) do
           [val|_] -> val
-          _ -> nil
+          _ -> default_value
         end
     end
   end

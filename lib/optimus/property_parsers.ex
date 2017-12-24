@@ -84,4 +84,7 @@ defmodule Optimus.PropertyParsers do
   end
   def build_long(name, _), do: {:error, "value of #{inspect name} property is expected to be String or nil"}
 
+
+  def build_default(_name, fun) when is_function(fun, 0), do: {:ok, fun.()}
+  def build_default(_name, value), do: {:ok, value}
 end

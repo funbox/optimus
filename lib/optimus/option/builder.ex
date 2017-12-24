@@ -17,8 +17,9 @@ defmodule Optimus.Option.Builder do
     {:ok, help} <- build_help(props),
     {:ok, multiple} <- build_multiple(props),
     {:ok, required} <- build_required(props),
+    {:ok, default} <- build_default(props),
     {:ok, parser} <- build_parser(props),
-    {:ok, option} <- validate(%Option{option| value_name: value_name, short: short, long: long, help: help, multiple: multiple, required: required, parser: parser}),
+    {:ok, option} <- validate(%Option{option| value_name: value_name, short: short, long: long, help: help, multiple: multiple, required: required, default: default, parser: parser}),
     do: {:ok, option}
   end
 
@@ -53,6 +54,10 @@ defmodule Optimus.Option.Builder do
 
   defp build_required(props) do
     PP.build_bool(:required, props[:required], false)
+  end
+
+  defp build_default(props) do
+    PP.build_default(:default, props[:default])
   end
 
   defp build_parser(props) do

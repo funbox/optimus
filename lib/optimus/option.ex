@@ -8,6 +8,7 @@ defmodule Optimus.Option do
     :help,
     :multiple,
     :required,
+    :default,
     :parser
   ]
 
@@ -96,6 +97,20 @@ defimpl Optimus.Format, for: Optimus.Option do
     end
   end
 
-  def help(option), do: option.help || ""
+  def help(option) do
+    help_string = option.help || ""
+
+    if option.default do
+      default_value_string =
+        if is_list(option.default) do
+          option.default |> Enum.map(&to_string/1) |> inspect
+        else
+          to_string(option.default)
+        end
+      "#{help_string} (default: #{default_value_string})"
+    else
+      help_string
+    end
+  end
 
 end
