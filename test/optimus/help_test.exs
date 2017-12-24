@@ -45,6 +45,21 @@ defmodule Optimus.HelpTest do
           long: "second-option",
           help: "Help Help me if you can, I'm feeling down And I do appreciate you being 'round Help me get my feet back on the ground Won't you please, please help me?"
         ],
+        default_1: [
+          value_name: "DEF_1_OPTION",
+          short: "d",
+          long: "def-1-option",
+          help: "Help Help me if you can, I'm feeling down And I do appreciate you being 'round Help me get my feet back on the ground Won't you please, please help me?",
+          default: "1"
+        ],
+        default_2: [
+          value_name: "DEF_2_OPTION",
+          short: "e",
+          long: "def-2-option",
+          multiple: true,
+          help: "Help Help me if you can, I'm feeling down And I do appreciate you being 'round Help me get my feet back on the ground Won't you please, please help me?",
+          default: ["a", "b"]
+        ],
       ],
       subcommands: [
         subcommand: [
@@ -69,7 +84,7 @@ defmodule Optimus.HelpTest do
       "Does awesome things",
       "",
       "USAGE:",
-      "    awesome [--first-flag] [-s] [-o FIRST_OPTION] [--second-option SECOND_OPTION] FIRST SECOND THIRD",
+      "    awesome [--first-flag] [-s] [-o FIRST_OPTION] [--second-option SECOND_OPTION] [--def-1-option DEF_1_OPTION] [--def-2-option DEF_2_OPTION] FIRST SECOND THIRD",
       "    awesome --version",
       "    awesome --help",
       "    awesome help subcommand",
@@ -105,6 +120,14 @@ defmodule Optimus.HelpTest do
       "                               do appreciate you being 'round Help me get my    ",
       "                               feet back on the ground Won't you please, please ",
       "                               help me?                                         ",
+      "    -d, --def-1-option         Help Help me if you can, I'm feeling down And I  ",
+      "                               do appreciate you being 'round Help me get my    ",
+      "                               feet back on the ground Won't you please, please ",
+      "                               help me? (default: 1)                            ",
+      "    -e, --def-2-option         Help Help me if you can, I'm feeling down And I  ",
+      "                               do appreciate you being 'round Help me get my    ",
+      "                               feet back on the ground Won't you please, please ",
+      "                               help me? (default: [\"a\", \"b\"])                   ",
       "",
       "SUBCOMMANDS:",
       "",
