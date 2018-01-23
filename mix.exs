@@ -4,7 +4,7 @@ defmodule Optimus.Mixfile do
   def project do
     [
       app: :optimus,
-      version: "0.1.6",
+      version: "0.1.7",
       elixir: "~> 1.3",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -34,7 +34,7 @@ defmodule Optimus.Mixfile do
       {:dialyxir, ">= 0.0.0", only: :dev},
       {:excoveralls, ">= 0.0.0", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:yamerl, "~> 0.4.0"}
+      {:yamerl, "~> 0.6.0"}
     ]
   end
 
