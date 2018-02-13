@@ -2,7 +2,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/savonarola/optimus/badge.svg?branch=master)](https://coveralls.io/github/savonarola/optimus?branch=master)
 
 <a href="https://funbox.ru">
-  <img src="http://funbox.ru/badges/sponsored_by_funbox_vrt.svg" alt="Sponsored by FunBox" width=250 />
+  <img src="http://funbox.ru/badges/sponsored_by_funbox_compact.svg" alt="Sponsored by FunBox" width=250 />
 </a>
 
 # Optimus
@@ -144,7 +144,7 @@ Not required `options` can have a `default` value. Both a term (string, number, 
 Now if we try to launch our compiled escript without any args we'll see the following:
 
 ```
->./statcalc     
+>./statcalc
 The following errors occured:
 - missing required arguments: INPUT_FILE
 - missing required options: --from(-f), --to(-t)
@@ -178,22 +178,22 @@ USAGE:
 
 ARGS:
 
-    INPUT_FILE         File with raw data                                       
-    OUTPUT_FILE        File to write statistics to                              
+    INPUT_FILE         File with raw data
+    OUTPUT_FILE        File to write statistics to
 
 FLAGS:
 
-    -h, --print-header        Specifies wheather to print header before the     
-                              outputs                                           
+    -h, --print-header        Specifies wheather to print header before the
+                              outputs
 
 OPTIONS:
 
-    -f, --from        Start date for the period                                 
+    -f, --from        Start date for the period
     -t, --to          End date for the period  (default: 2017-12-20)
 
 SUBCOMMANDS:
 
-    validate        Validates the raw contents of a file                        
+    validate        Validates the raw contents of a file
 
 ```
 
