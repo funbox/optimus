@@ -214,7 +214,7 @@ defmodule Optimus do
           else
             option.default
           end
-        
+
         case Map.get(parsed, {:option, option.name}, default_value) do
           [val|_] -> val
           _ -> default_value

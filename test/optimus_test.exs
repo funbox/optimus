@@ -452,7 +452,9 @@ defmodule OptimusTest do
       ]
     )
     assert {:error, _} = Optimus.parse(optimus, ~w{-s -s})
+    assert {:error, _} = Optimus.parse(optimus, ~w{-sfs})
     assert {:ok, _} = Optimus.parse(optimus, ~w{-f -f})
+    assert {:ok, _} = Optimus.parse(optimus, ~w{-fffffsffff})
   end
 
   test "parse: invalid command line" do
@@ -547,15 +549,21 @@ defmodule OptimusTest do
         second: [long: "--second"],
         third: [short: "-t", long: "--third", multiple: true],
         fourth: [long: "--fourth", multiple: true],
-        fifth: [long: "--fifth"]
-    ])
-    command_line = ~w{-f --second -t --third}
+        fifth: [long: "--fifth"],
+        x: [short: "-x", multiple: true],
+        y: [short: "-y"],
+        z: [short: "-z"],
+      ])
+    command_line = ~w{-f --second -t --third -xyxz}
     assert {:ok, parsed} = Optimus.parse(optimus, command_line)
     assert true == parsed.flags[:first]
     assert true == parsed.flags[:second]
     assert 2 == parsed.flags[:third]
     assert 0 == parsed.flags[:fourth]
     assert false == parsed.flags[:fifth]
+    assert 2 == parsed.flags[:x]
+    assert true == parsed.flags[:y]
+    assert true == parsed.flags[:z]
   end
 
   test "parse: options" do
