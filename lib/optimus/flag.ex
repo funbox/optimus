@@ -42,7 +42,7 @@ defmodule Optimus.Flag do
     "-" <> String.trim_leading(string, flag.short)
   end
 
-  def try_match([flag | flags] = all_flags, parsed, items) do
+  def try_match([flag | flags], parsed, items) do
     case parse(flag, parsed, items) do
       :skip ->
         try_match(flags, parsed, items)
