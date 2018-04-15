@@ -34,7 +34,7 @@ defmodule Optimus.Mixfile do
       {:dialyxir, ">= 0.0.0", only: :dev},
       {:excoveralls, ">= 0.0.0", only: :test},
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:yamerl, "~> 0.6.0"}
+      {:yamerl, "~> 0.6"}
     ]
   end
 
