@@ -1,13 +1,13 @@
 defmodule Optimus.Usage do
-
   def usage(optimus, subcommand_path \\ []) do
     {subcommand, subcommand_name} = Optimus.fetch_subcommand(optimus, subcommand_path)
     flag_info = format_usage(subcommand.flags)
     option_info = format_usage(subcommand.options)
     arg_info = format_arg_usage(subcommand)
     usage_parts = [subcommand_name, flag_info, option_info, arg_info]
+
     usage_parts
-    |> List.flatten
+    |> List.flatten()
     |> Enum.join(" ")
   end
 
@@ -30,12 +30,11 @@ defmodule Optimus.Usage do
 
   defp format_arg_usage(subcommand) do
     arg_usage = format_usage(subcommand.args)
+
     if subcommand.allow_unknown_args do
       arg_usage ++ ["..."]
     else
       arg_usage
     end
   end
-
-
 end

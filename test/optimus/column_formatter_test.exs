@@ -18,7 +18,7 @@ defmodule Optimus.ColumnFormatterTest do
   test "format: invalid specs" do
     assert {:error, _} = CF.format([:s], ["a"])
     assert {:error, _} = CF.format([-1], ["a"])
-    assert {:error, _} = CF.format([{1,2,3}], ["a"])
+    assert {:error, _} = CF.format([{1, 2, 3}], ["a"])
     assert {:error, _} = CF.format([{-1, :left}], ["a"])
     assert {:error, _} = CF.format([{1, :top}], ["a"])
   end
@@ -29,11 +29,12 @@ defmodule Optimus.ColumnFormatterTest do
   end
 
   test "right" do
-    assert {:ok, [[" a b", "  "], [" c d", "  "]]} == CF.format([{4, :right}, 2], [" a b c d", ""])
+    assert {:ok, [[" a b", "  "], [" c d", "  "]]} ==
+             CF.format([{4, :right}, 2], [" a b c d", ""])
   end
 
   test "center" do
-    assert {:ok, [[" a ", "  "], ["b c", "  "], [" d ", "  "]]} == CF.format([{3, :center}, 2], [" a b c d", ""])
+    assert {:ok, [[" a ", "  "], ["b c", "  "], [" d ", "  "]]} ==
+             CF.format([{3, :center}, 2], [" a b c d", ""])
   end
-
 end

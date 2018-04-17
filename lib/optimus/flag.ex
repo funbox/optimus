@@ -1,5 +1,4 @@
 defmodule Optimus.Flag do
-
   defstruct [
     :name,
     :short,
@@ -16,23 +15,29 @@ defmodule Optimus.Flag do
     case flag_met?(flag, items) do
       {:met, new_items} ->
         key = {:flag, flag.name}
+
         if flag.multiple || !Map.has_key?(parsed, key) do
           {:ok, Map.update(parsed, key, 1, &(1 + &1)), new_items}
         else
-          {:error, "multiple occurences of flag #{Optimus.Format.format_in_error(flag)}", new_items}
+          {:error, "multiple occurences of flag #{Optimus.Format.format_in_error(flag)}",
+           new_items}
         end
+
       :not_met ->
         :skip
     end
   end
+
   def parse(_, _, _), do: :skip
 
   defp flag_met?(flag, [item | items]) do
     cond do
       flag.short == item || flag.long == item ->
         {:met, items}
+
       flag.short && String.starts_with?(item, flag.short) ->
         {:met, [cutoff_short_flag(flag, item) | items]}
+
       true ->
         :not_met
     end
@@ -46,15 +51,16 @@ defmodule Optimus.Flag do
     case parse(flag, parsed, items) do
       :skip ->
         try_match(flags, parsed, items)
-      value -> value
+
+      value ->
+        value
     end
   end
-  def try_match([], _, _), do: :skip
 
+  def try_match([], _, _), do: :skip
 end
 
 defimpl Optimus.Format, for: Optimus.Flag do
-
   def format(flag) do
     [flag.short, flag.long]
     |> Enum.reject(&is_nil/1)
@@ -75,5 +81,4 @@ defimpl Optimus.Format, for: Optimus.Flag do
   end
 
   def help(flag), do: flag.help || ""
-
 end

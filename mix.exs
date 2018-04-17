@@ -6,12 +6,12 @@ defmodule Optimus.Mixfile do
       app: :optimus,
       version: "0.1.8",
       elixir: "~> 1.3",
-      build_embedded: Mix.env == :prod,
-      start_permanent: Mix.env == :prod,
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
-        "coveralls": :test,
+        coveralls: :test,
         "coveralls.detail": :test,
         "coveralls.post": :test,
         "coveralls.html": :test
@@ -19,7 +19,7 @@ defmodule Optimus.Mixfile do
       dialyzer: [
         plt_add_deps: true,
         plt_add_apps: [:ssl],
-        flags: ["-Werror_handling", "-Wrace_conditions"],
+        flags: ["-Werror_handling", "-Wrace_conditions"]
       ],
       package: package()
     ]

@@ -1,5 +1,4 @@
 defmodule Optimus.Option do
-
   defstruct [
     :name,
     :value_name,
@@ -20,22 +19,35 @@ defmodule Optimus.Option do
     case parse_option_parts(option, command_line) do
       {:ok, raw_value, rest} ->
         key = {:option, option.name}
+
         if option.multiple || !Map.has_key?(parsed, key) do
           case option.parser.(raw_value) do
-            {:ok, value} -> {:ok, Map.update(parsed, key, [value], &([value | &1])), rest}
-            {:error, reason} -> {:error, "invalid value #{inspect raw_value} for #{Optimus.Format.format_in_error(option)} option: #{reason}", rest}
+            {:ok, value} ->
+              {:ok, Map.update(parsed, key, [value], &[value | &1]), rest}
+
+            {:error, reason} ->
+              {:error,
+               "invalid value #{inspect(raw_value)} for #{Optimus.Format.format_in_error(option)} option: #{
+                 reason
+               }", rest}
           end
         else
-          {:error, "multiple occurences of option #{Optimus.Format.format_in_error(option)}", rest}
+          {:error, "multiple occurences of option #{Optimus.Format.format_in_error(option)}",
+           rest}
         end
-      :skip -> :skip
+
+      :skip ->
+        :skip
     end
   end
+
   def parse(_, _, _), do: :skip
 
   defp parse_option_parts(option, [item | items]) do
     case extract_value(option, item) do
-      {:ok, value} -> {:ok, value, items}
+      {:ok, value} ->
+        {:ok, value, items}
+
       :none ->
         case items do
           [value_item | rest] ->
@@ -44,7 +56,9 @@ defmodule Optimus.Option do
             else
               :skip
             end
-          _ -> :skip
+
+          _ ->
+            :skip
         end
     end
   end
@@ -52,7 +66,8 @@ defmodule Optimus.Option do
   defp extract_value(option, str) do
     if option.long do
       length = String.length(option.long) + 1
-      if option.long <> "=" == String.slice(str, 0..length-1) do
+
+      if option.long <> "=" == String.slice(str, 0..(length - 1)) do
         {:ok, String.slice(str, length..-1)}
       else
         :none
@@ -68,12 +83,11 @@ defmodule Optimus.Option do
       value -> value
     end
   end
-  def try_match([], _, _), do: :skip
 
+  def try_match([], _, _), do: :skip
 end
 
 defimpl Optimus.Format, for: Optimus.Option do
-
   def format(option) do
     [option.short, option.long]
     |> Enum.reject(&is_nil/1)
@@ -90,6 +104,7 @@ defimpl Optimus.Format, for: Optimus.Option do
 
   def format_in_usage(option) do
     option_name = option.long || option.short
+
     if option.required do
       "#{option_name} #{option.value_name}"
     else
@@ -107,10 +122,10 @@ defimpl Optimus.Format, for: Optimus.Option do
         else
           to_string(option.default)
         end
+
       "#{help_string} (default: #{default_value_string})"
     else
       help_string
     end
   end
-
 end

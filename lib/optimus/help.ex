@@ -1,15 +1,14 @@
 defmodule Optimus.Help do
-
   def help(optimus, subcommand_path, max_width) do
-
     title = Optimus.Title.title(optimus, subcommand_path)
     usage = usage(optimus, subcommand_path)
 
     {subcommand, _} = Optimus.fetch_subcommand(optimus, subcommand_path)
 
-    formatable_help = subcommand_formatables(subcommand)
-    |> nonempty_formatables
-    |> formatable_help(max_width)
+    formatable_help =
+      subcommand_formatables(subcommand)
+      |> nonempty_formatables
+      |> formatable_help(max_width)
 
     title ++ usage ++ formatable_help ++ [""]
   end
@@ -58,7 +57,6 @@ defmodule Optimus.Help do
       Optimus.FormatableHelp.formatable_help(title, formatables, max_width)
     end)
     |> Enum.intersperse([""])
-    |> Enum.concat
+    |> Enum.concat()
   end
-
 end

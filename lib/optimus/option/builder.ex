@@ -5,34 +5,45 @@ defmodule Optimus.Option.Builder do
   def build({name, props}) do
     case build_from_props(%Option{name: name}, props) do
       {:ok, _option} = res -> res
-      {:error, reason} -> {:error, "invalid option #{inspect name} properties: #{reason}"}
+      {:error, reason} -> {:error, "invalid option #{inspect(name)} properties: #{reason}"}
     end
   end
 
   defp build_from_props(option, props) do
     with :ok <- validate_keyword_list(option.name, props),
-    {:ok, value_name} <- build_value_name(props, option.name),
-    {:ok, short} <- build_short(props),
-    {:ok, long} <- build_long(props),
-    {:ok, help} <- build_help(props),
-    {:ok, multiple} <- build_multiple(props),
-    {:ok, required} <- build_required(props),
-    {:ok, default} <- build_default(props),
-    {:ok, parser} <- build_parser(props),
-    {:ok, option} <- validate(%Option{option| value_name: value_name, short: short, long: long, help: help, multiple: multiple, required: required, default: default, parser: parser}),
-    do: {:ok, option}
+         {:ok, value_name} <- build_value_name(props, option.name),
+         {:ok, short} <- build_short(props),
+         {:ok, long} <- build_long(props),
+         {:ok, help} <- build_help(props),
+         {:ok, multiple} <- build_multiple(props),
+         {:ok, required} <- build_required(props),
+         {:ok, default} <- build_default(props),
+         {:ok, parser} <- build_parser(props),
+         {:ok, option} <-
+           validate(%Option{
+             option
+             | value_name: value_name,
+               short: short,
+               long: long,
+               help: help,
+               multiple: multiple,
+               required: required,
+               default: default,
+               parser: parser
+           }),
+         do: {:ok, option}
   end
 
   defp validate_keyword_list(name, list) do
     if Keyword.keyword?(list) do
       :ok
     else
-      {:error, "properties for option #{inspect name} should be a keyword list"}
+      {:error, "properties for option #{inspect(name)} should be a keyword list"}
     end
   end
 
   defp build_value_name(props, name) do
-    default = name |> to_string |> String.upcase
+    default = name |> to_string |> String.upcase()
     PP.build_string(:value_name, props[:value_name], default)
   end
 
@@ -71,5 +82,4 @@ defmodule Optimus.Option.Builder do
       {:error, "neither :short nor :long form defined"}
     end
   end
-
 end

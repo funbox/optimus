@@ -19,9 +19,10 @@ defmodule Optimus.YamlLoader do
   end
 
   defp map_keys({key, value}), do: {String.to_atom(key), map_keys(value)}
+
   defp map_keys(list) when is_list(list) do
     for entry <- list, do: map_keys(entry)
   end
-  defp map_keys(val), do: val
 
+  defp map_keys(val), do: val
 end
