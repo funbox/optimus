@@ -184,7 +184,7 @@ defmodule Optimus do
   end
 
   defp columns do
-    case :io.columns() do
+    case Optimus.Term.width() do
       {:ok, width} -> width
       _ -> 80
     end
