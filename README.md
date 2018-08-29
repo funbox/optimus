@@ -11,11 +11,11 @@
 
 It's aim is to take off the maximum possible amount of manual argument handling.
 The intended use case is to configure `Optimus` parser, run it against the
-command line and then do noting but take completely validated
+command line and then do nothing but take completely validated
 ready to use values.
 
 `Optimus` was strongly inspired by the awesome [`clap.rs`](https://clap.rs/)
-library. `Optimus` does not generally follows its design, but it tries to
+library. `Optimus` does not generally follow its design, but it tries to
 follow the idea of zero manual manipulation with the values after the parser has
 returned them.
 
