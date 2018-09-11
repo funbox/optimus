@@ -4,7 +4,9 @@ defmodule Optimus.Flag do
     :short,
     :long,
     :help,
-    :multiple
+    :multiple,
+    :requires,
+    :conflicts
   ]
 
   def new(spec) do
@@ -81,4 +83,6 @@ defimpl Optimus.Format, for: Optimus.Flag do
   end
 
   def help(flag), do: flag.help || ""
+
+  def type_name(_), do: "flag"
 end

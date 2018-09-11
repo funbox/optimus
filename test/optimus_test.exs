@@ -760,4 +760,144 @@ defmodule OptimusTest do
   test "from_yaml: missing file" do
     {:error, _} = Optimus.from_yaml("test/fixtures/missing_sample.yaml")
   end
+
+  test "deps builder: ok" do
+    assert {:ok, _} =
+             Optimus.new(
+               flags: [
+                 a: [
+                   short: "-a"
+                 ],
+                 b: [
+                   short: "-b"
+                 ],
+                 c: [
+                   short: "-c",
+                   requires: [
+                     args: [:g],
+                     flags: [:a],
+                     options: [:d]
+                   ],
+                   conflicts: [
+                     args: [:h],
+                     flags: [:b],
+                     options: [:e]
+                   ]
+                 ]
+               ],
+               options: [
+                 d: [
+                   short: "-d"
+                 ],
+                 e: [
+                   short: "-e"
+                 ],
+                 f: [
+                   short: "-f",
+                   requires: [
+                     args: [:g],
+                     flags: [:a],
+                     options: [:d]
+                   ],
+                   conflicts: [
+                     args: [:h],
+                     flags: [:b],
+                     options: [:e]
+                   ]
+                 ]
+               ],
+               args: [
+                 g: [],
+                 h: [],
+                 j: [
+                   requires: [
+                     args: [:g],
+                     flags: [:a],
+                     options: [:d]
+                   ],
+                   conflicts: [
+                     args: [:h],
+                     flags: [:b],
+                     options: [:e]
+                   ]
+                 ]
+               ]
+             )
+  end
+
+  test "deps builder: invalid flag require" do
+    assert {:error, _} =
+             Optimus.new(
+               flags: [
+                 a: [
+                   short: "-a"
+                 ]
+               ],
+               options: [
+                 f: [
+                   short: "-f",
+                   requires: [
+                     flags: [:b]
+                   ]
+                 ]
+               ]
+             )
+  end
+
+  test "deps builder: invalid flag conflict" do
+    assert {:error, _} =
+             Optimus.new(
+               flags: [
+                 a: [
+                   short: "-a"
+                 ]
+               ],
+               options: [
+                 f: [
+                   short: "-f",
+                   conflicts: [
+                     flags: [:b]
+                   ]
+                 ]
+               ]
+             )
+  end
+
+  test "deps builder: invalid option require" do
+    assert {:error, _} =
+             Optimus.new(
+               flags: [
+                 a: [
+                   short: "-a",
+                   requires: [
+                     options: [:z]
+                   ]
+                 ]
+               ],
+               options: [
+                 f: [
+                   short: "-f"
+                 ]
+               ]
+             )
+  end
+
+  test "deps builder: invalid option conflict" do
+    assert {:error, _} =
+             Optimus.new(
+               flags: [
+                 a: [
+                   short: "-a",
+                   conflicts: [
+                     options: [:z]
+                   ]
+                 ]
+               ],
+               options: [
+                 f: [
+                   short: "-f"
+                 ]
+               ]
+             )
+  end
 end

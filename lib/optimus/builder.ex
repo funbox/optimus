@@ -17,6 +17,7 @@ defmodule Optimus.Builder do
          {:ok, subcommands} <- build_subcommands(props[:subcommands]),
          :ok <- validate_args(args),
          :ok <- validate_conflicts(flags, options),
+         :ok <- validate_deps(args, flags, options),
          do:
            {:ok,
             %Optimus{
@@ -150,6 +151,51 @@ defmodule Optimus.Builder do
     case duplicate do
       {name, _} -> {:error, "duplicate #{key} option name: #{name}"}
       nil -> :ok
+    end
+  end
+
+  defp validate_deps(args, flags, options) do
+    validate_deps(args ++ flags ++ options, args, flags, options)
+  end
+
+  defp validate_deps([], _, _, _), do: :ok
+
+  defp validate_deps(
+         [%_{name: name, requires: requires, conflicts: conflicts} = item | rest],
+         args,
+         flags,
+         options
+       ) do
+    with :ok <- validate_deps("requires", requires, args, flags, options),
+         :ok <- validate_deps("conflicts with", conflicts, args, flags, options) do
+      validate_deps(rest, args, flags, options)
+    else
+      {:error, error} ->
+        {:error,
+         "error in #{Optimus.Format.type_name(item)} #{inspect(name)} dependencies: #{error}"}
+    end
+  end
+
+  defp validate_deps(dep_kind, deps, args, flags, options) do
+    with :ok <- validate_inclusion(deps.args, "arg", names(args)),
+         :ok <- validate_inclusion(deps.flags, "flag", names(flags)),
+         :ok <- validate_inclusion(deps.options, "option", names(options)) do
+      :ok
+    else
+      {:error, error} -> {:error, "it #{dep_kind} #{error}"}
+    end
+  end
+
+  defp names(items), do: Enum.map(items, & &1.name)
+
+  defp validate_inclusion([], _, _), do: :ok
+
+  defp validate_inclusion([name | rest], kind, valid_names) do
+    if name in valid_names do
+      validate_inclusion(rest, kind, valid_names)
+    else
+      {:error,
+       "#{kind} #{inspect(name)}, but the only #{kind}s specified are #{inspect(valid_names)}"}
     end
   end
 end

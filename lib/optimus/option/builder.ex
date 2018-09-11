@@ -1,6 +1,7 @@
 defmodule Optimus.Option.Builder do
   alias Optimus.Option
   alias Optimus.PropertyParsers, as: PP
+  alias Optimus.Deps.Builder, as: DepsBuilder
 
   def build({name, props}) do
     case build_from_props(%Option{name: name}, props) do
@@ -19,6 +20,8 @@ defmodule Optimus.Option.Builder do
          {:ok, required} <- build_required(props),
          {:ok, default} <- build_default(props),
          {:ok, parser} <- build_parser(props),
+         {:ok, requires} <- build_deps(:requires, props),
+         {:ok, conflicts} <- build_deps(:conflicts, props),
          {:ok, option} <-
            validate(%Option{
              option
@@ -29,7 +32,9 @@ defmodule Optimus.Option.Builder do
                multiple: multiple,
                required: required,
                default: default,
-               parser: parser
+               parser: parser,
+               requires: requires,
+               conflicts: conflicts
            }),
          do: {:ok, option}
   end
@@ -73,6 +78,10 @@ defmodule Optimus.Option.Builder do
 
   defp build_parser(props) do
     PP.build_parser(:parser, props[:parser])
+  end
+
+  def build_deps(key, props) do
+    DepsBuilder.build(props[key])
   end
 
   defp validate(option) do

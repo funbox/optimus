@@ -1,6 +1,7 @@
 defmodule Optimus.Flag.Builder do
   alias Optimus.Flag
   alias Optimus.PropertyParsers, as: PP
+  alias Optimus.Deps.Builder, as: DepsBuilder
 
   def build({name, props}) do
     case build_from_props(%Flag{name: name}, props) do
@@ -15,8 +16,18 @@ defmodule Optimus.Flag.Builder do
          {:ok, long} <- build_long(props),
          {:ok, help} <- build_help(props),
          {:ok, multiple} <- build_multiple(props),
+         {:ok, requires} <- build_deps(:requires, props),
+         {:ok, conflicts} <- build_deps(:conflicts, props),
          {:ok, flag} <-
-           validate(%Flag{flag | short: short, long: long, help: help, multiple: multiple}),
+           validate(%Flag{
+             flag
+             | short: short,
+               long: long,
+               help: help,
+               multiple: multiple,
+               requires: requires,
+               conflicts: conflicts
+           }),
          do: {:ok, flag}
   end
 
@@ -42,6 +53,10 @@ defmodule Optimus.Flag.Builder do
 
   defp build_multiple(props) do
     PP.build_bool(:multiple, props[:multiple], false)
+  end
+
+  def build_deps(key, props) do
+    DepsBuilder.build(props[key])
   end
 
   defp validate(flag) do

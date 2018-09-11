@@ -8,7 +8,9 @@ defmodule Optimus.Option do
     :multiple,
     :required,
     :default,
-    :parser
+    :parser,
+    :requires,
+    :conflicts
   ]
 
   def new(spec) do
@@ -128,4 +130,6 @@ defimpl Optimus.Format, for: Optimus.Option do
       help_string
     end
   end
+
+  def type_name(_), do: "option"
 end

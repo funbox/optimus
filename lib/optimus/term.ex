@@ -10,7 +10,9 @@ defmodule Optimus.Term do
             {width, _} -> {:ok, width}
             :error -> {:error, "invalid tputs result"}
           end
-        {error, _} -> {:error, "tputs error: #{error}"}
+
+        {error, _} ->
+          {:error, "tputs error: #{error}"}
       end
     rescue
       error in ErlangError ->

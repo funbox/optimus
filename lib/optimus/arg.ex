@@ -4,7 +4,9 @@ defmodule Optimus.Arg do
     :value_name,
     :help,
     :required,
-    :parser
+    :parser,
+    :requires,
+    :conflicts
   ]
 
   def new(spec) do
@@ -36,4 +38,6 @@ defimpl Optimus.Format, for: Optimus.Arg do
   end
 
   def help(arg), do: arg.help || ""
+
+  def type_name(_), do: "argument"
 end
