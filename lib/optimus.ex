@@ -44,18 +44,21 @@ defmodule Optimus do
   @type custom_parser :: (String.t() -> parser_result)
   @type parser :: :integer | :float | :string | custom_parser
 
-  @type arg_spec_item ::
+  @type arg_spec_param ::
           {:value_name, String.t()}
           | {:help, String.t()}
           | {:required, boolean}
           | {:parser, parser}
-  @type arg_spec :: [arg_spec_item]
+  @type arg_spec_item :: {name :: atom, [arg_spec_param]}
 
-  @type flag_spec_item ::
-          {:short, String.t()} | {:long, String.t()} | {:help, String.t()} | {:multiple, boolean}
-  @type flag_spec :: [flag_spec_item]
+  @type flag_spec_param ::
+          {:short, String.t()}
+          | {:long, String.t()}
+          | {:help, String.t()}
+          | {:multiple, boolean}
+  @type flag_spec_item :: {name :: atom, [flag_spec_param]}
 
-  @type option_spec_item ::
+  @type option_spec_param ::
           {:value_name, String.t()}
           | {:short, String.t()}
           | {:long, String.t()}
@@ -63,7 +66,7 @@ defmodule Optimus do
           | {:multiple, boolean}
           | {:required, boolean}
           | {:parser, parser}
-  @type option_spec :: [option_spec_item]
+  @type option_spec_item :: {name :: atom, [option_spec_param]}
 
   @type spec_item ::
           {:name, String.t()}
@@ -73,9 +76,9 @@ defmodule Optimus do
           | {:about, String.t()}
           | {:allow_unknown_args, boolean}
           | {:parse_double_dash, boolean}
-          | {:args, [arg_spec]}
-          | {:flags, [flag_spec]}
-          | {:options, [option_spec]}
+          | {:args, [arg_spec_item]}
+          | {:flags, [flag_spec_item]}
+          | {:options, [option_spec_item]}
   @type spec :: [spec_item]
 
   @type error :: String.t()
@@ -104,7 +107,7 @@ defmodule Optimus do
     with {:ok, spec} <- Optimus.YamlLoader.load(filename), do: new(spec)
   end
 
-  @spec from_yaml(filename :: String.t()) :: t | no_return
+  @spec from_yaml!(filename :: String.t()) :: t | no_return
   def from_yaml!(filename) do
     case from_yaml(filename) do
       {:ok, optimus} ->
