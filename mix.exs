@@ -44,7 +44,7 @@ defmodule Optimus.Mixfile do
       files: ["lib", "mix.exs", "README*", "LICENSE*"],
       maintainers: ["Ilya Averyanov"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/savonarola/optimus"},
+      links: %{"GitHub" => "https://github.com/funbox/optimus"},
       description: "Command line option parser inspired by clap.rs"
     ]
   end

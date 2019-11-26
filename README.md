@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/savonarola/optimus.svg?branch=master)](https://travis-ci.org/savonarola/optimus)
-[![Coverage Status](https://coveralls.io/repos/github/savonarola/optimus/badge.svg?branch=master)](https://coveralls.io/github/savonarola/optimus?branch=master)
+[![Build Status](https://travis-ci.org/funbox/optimus.svg?branch=master)](https://travis-ci.org/funbox/optimus)
+[![Coverage Status](https://coveralls.io/repos/github/funbox/optimus/badge.svg?branch=master)](https://coveralls.io/github/funbox/optimus?branch=master)
 
 <a href="https://funbox.ru">
   <img src="http://funbox.ru/badges/sponsored_by_funbox_compact.svg" alt="Sponsored by FunBox" width=250 />
