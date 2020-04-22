@@ -66,11 +66,12 @@ defmodule Optimus do
           | {:multiple, boolean}
           | {:required, boolean}
           | {:parser, parser}
+          | {:default, any}
   @type option_spec_item :: {name :: atom, [option_spec_param]}
 
   @type spec_item ::
           {:name, String.t()}
-          | {:name, String.t()}
+          | {:description, String.t()}
           | {:version, String.t()}
           | {:author, String.t()}
           | {:about, String.t()}
