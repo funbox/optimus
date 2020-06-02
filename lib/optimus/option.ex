@@ -118,14 +118,22 @@ defimpl Optimus.Format, for: Optimus.Option do
     if option.default do
       default_value_string =
         if is_list(option.default) do
-          option.default |> Enum.map(&to_string/1) |> inspect
+          option.default |> Enum.map(&to_s/1) |> inspect
         else
-          to_string(option.default)
+          to_s(option.default)
         end
 
       "#{help_string} (default: #{default_value_string})"
     else
       help_string
+    end
+  end
+
+  def to_s(term) do
+    if String.Chars.impl_for(term) do
+      to_string(term)
+    else
+      inspect(term)
     end
   end
 end

@@ -69,6 +69,13 @@ defmodule Optimus.HelpTest do
             help:
               "Help Help me if you can, I'm feeling down And I do appreciate you being 'round Help me get my feet back on the ground Won't you please, please help me?",
             default: ["a", "b"]
+          ],
+          default_2: [
+            value_name: "DEF_3_OPTION",
+            long: "def-3-option",
+            help:
+              "Help Help me if you can, I'm feeling down And I do appreciate you being 'round Help me get my feet back on the ground Won't you please, please help me?",
+            default: 100..200
           ]
         ],
         subcommands: [
@@ -96,7 +103,7 @@ defmodule Optimus.HelpTest do
              "Does awesome things",
              "",
              "USAGE:",
-             "    awesome [--first-flag] [-s] [-o FIRST_OPTION] [--second-option SECOND_OPTION] [--def-1-option DEF_1_OPTION] [--def-2-option DEF_2_OPTION] FIRST SECOND THIRD",
+             "    awesome [--first-flag] [-s] [-o FIRST_OPTION] [--second-option SECOND_OPTION] [--def-1-option DEF_1_OPTION] [--def-2-option DEF_2_OPTION] [--def-3-option DEF_3_OPTION] FIRST SECOND THIRD",
              "    awesome --version",
              "    awesome --help",
              "    awesome help subcommand",
@@ -140,6 +147,10 @@ defmodule Optimus.HelpTest do
              "                               do appreciate you being 'round Help me get my    ",
              "                               feet back on the ground Won't you please, please ",
              "                               help me? (default: [\"a\", \"b\"])                   ",
+             "    --def-3-option             Help Help me if you can, I'm feeling down And I  ",
+             "                               do appreciate you being 'round Help me get my    ",
+             "                               feet back on the ground Won't you please, please ",
+             "                               help me? (default: 100..200)                     ",
              "",
              "SUBCOMMANDS:",
              "",
