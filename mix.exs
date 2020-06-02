@@ -4,7 +4,7 @@ defmodule Optimus.Mixfile do
   def project do
     [
       app: :optimus,
-      version: "0.1.10",
+      version: "0.1.11",
       elixir: "~> 1.3",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
