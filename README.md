@@ -1,5 +1,9 @@
 # Optimus
 
+<img align="right" width="192" height="192"
+     alt="Optimus avatar: Transformer's head shaped as a letter “O”"
+     src="./logo.png">
+
 [![Build Status](https://travis-ci.org/funbox/optimus.svg?branch=master)](https://travis-ci.org/funbox/optimus)
 [![Coverage Status](https://coveralls.io/repos/github/funbox/optimus/badge.svg?branch=master)](https://coveralls.io/github/funbox/optimus?branch=master)
 
@@ -242,5 +246,7 @@ But in this case custom parsers are obviously unavailable.
 
 * [José Valim](https://github.com/josevalim) and all other creators of [`Elixir`](http://elixir-lang.org)
 * [Kevin K.](https://github.com/kbknapp) and all other creators of [`clap.rs`](https://clap.rs)
+
+Brutal picture for the project was made by [Igor Garybaldi](http://pandabanda.com/).
 
 [![Sponsored by FunBox](https://funbox.ru/badges/sponsored_by_funbox_centered.svg)](https://funbox.ru)
