@@ -1,0 +1,117 @@
+name: Elixir CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+
+    # https://github.com/elixir-lang/elixir/blob/master/lib/elixir/pages/compatibility-and-deprecations.md
+    strategy:
+      matrix:
+        include:
+
+          # Elixir 1.7
+
+          - elixir: 1.7.4
+            otp_release: 19.3
+
+          - elixir: 1.7.4
+            otp_release: 20.3
+
+          - elixir: 1.7.4
+            otp_release: 21.0
+
+          - elixir: 1.7.4
+            otp_release: 22.0
+
+          # Elixir 1.8
+
+          - elixir: 1.8.2
+            otp_release: 20.3
+
+          - elixir: 1.8.2
+            otp_release: 21.0
+
+          - elixir: 1.8.2
+            otp_release: 22.0
+
+          # Elixir 1.9
+
+          - elixir: 1.9.0
+            otp_release: 20.3
+
+          - elixir: 1.9.0
+            otp_release: 21.0
+
+          - elixir: 1.9.0
+            otp_release: 22.0
+
+          # Elixir 1.10
+
+          - elixir: 1.10.0
+            otp_release: 21.0
+
+          - elixir: 1.10.0
+            otp_release: 22.0
+
+          - elixir: 1.10.3
+            otp_release: 23.0
+
+          # Elixir 1.11
+
+          - elixir: 1.11.0
+            otp_release: 21.0
+
+          - elixir: 1.11.0
+            otp_release: 22.0
+
+          - elixir: 1.11.0
+            otp_release: 23.0
+
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Elixir
+      uses: actions/setup-elixir@v1
+      with:
+        elixir-version: ${{ matrix.elixir }} # Define the elixir version [required]
+        otp-version: ${{ matrix.otp_release }} # Define the OTP version [required]
+    - name: Restore dependencies cache
+      uses: actions/cache@v2
+      with:
+        path: deps
+        key: ${{ matrix.elixir }}-${{ matrix.otp_release }}-${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+    - name: Install dependencies
+      run: mix deps.get
+    - name: Run tests
+      run: mix test
+
+  send_coveralls:
+    name: Send coveralls stats
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      MIX_ENV: test
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Elixir
+      uses: actions/setup-elixir@v1
+      with:
+        elixir-version: '1.10.4' # Define the elixir version [required]
+        otp-version: '23.0' # Define the OTP version [required]
+    - name: Restore dependencies cache
+      uses: actions/cache@v2
+      with:
+        path: deps
+        key: coveralls-${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+    - name: Install dependencies
+      run: mix deps.get
+    - name: Send coveralls
+      run: mix coveralls.github
+
