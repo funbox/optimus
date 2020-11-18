@@ -136,12 +136,12 @@ end
 
 Nearly all of the configuration options above are not mandatory.
 
-Also most configuration parameters are self-explanatory, except `parser`. 
-For options and positional arguments `parser` is a lambda which accepts a string argument and returns either 
-`{:ok, parsed_value}` or `{:error, string_reason}`. There are also some predefined parsers which are denoted by atoms: 
+Also most configuration parameters are self-explanatory, except `parser`.
+For options and positional arguments `parser` is a lambda which accepts a string argument and returns either
+`{:ok, parsed_value}` or `{:error, string_reason}`. There are also some predefined parsers which are denoted by atoms:
 `:string`, `:integer` and `:float`. No parser means that `:string` parser will be used.
 
-Not required `options` can have a `default` value. Both a term (string, number, etc.) or a lambda with zero arity can be used. 
+Not required `options` can have a `default` value. Both a term (string, number, etc.) or a lambda with zero arity can be used.
 If the `option` accepts `multiple` values, the `default` value should be a list, for example `[1.0]` or `fn -> ["x", "y"] end`.
 
 Now if we try to launch our compiled escript without any args we'll see the following:
@@ -233,14 +233,6 @@ which are maps, and `unknown`, which is a list. Things to note are:
 * for flags without `multiple: true` the value is a boolean;
 * for flags with `multiple: true` the value is an integer (representing the
   number of occurrences of a flag).
-
-One can load configuration from a YAML file:
-
-```elixir
-optimus = Optimus.from_yaml!("path/to/config.yaml")
-```
-
-But in this case custom parsers are obviously unavailable.
 
 ## Credits
 

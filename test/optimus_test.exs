@@ -749,15 +749,4 @@ defmodule OptimusTest do
     assert is_binary(Optimus.help(optimus))
   end
 
-  test "from_yaml: ok" do
-    {:ok, _} = Optimus.from_yaml("test/fixtures/good_sample.yaml")
-  end
-
-  test "from_yaml: bad file" do
-    {:error, _} = Optimus.from_yaml("test/fixtures/bad_sample.yaml")
-  end
-
-  test "from_yaml: missing file" do
-    {:error, _} = Optimus.from_yaml("test/fixtures/missing_sample.yaml")
-  end
 end
