@@ -29,11 +29,22 @@ defmodule Optimus.Mixfile do
     [applications: [:logger]]
   end
 
+  cond do
+    System.version() |> Version.match?(">= 1.10.0") ->
+      def ex_doc_version(), do: "~> 0.23"
+
+    System.version() |> Version.match?(">= 1.7.0") ->
+      def ex_doc_version(), do: "~> 0.22.0"
+
+    true ->
+      def ex_doc_version(), do: "~> 0.18.0"
+  end
+
   defp deps do
     [
-      {:dialyxir, ">= 1.0.0-rc.7", only: :dev},
-      {:excoveralls, ">= 0.0.0", only: :test},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:excoveralls, "~> 0.5", only: :test},
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:ex_doc, ex_doc_version(), only: :dev}
     ]
   end
 
