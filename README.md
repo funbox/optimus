@@ -25,7 +25,7 @@ Add `optimus` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:optimus, "~> 0.1.0"}]
+  [{:optimus, "~> 0.2"}]
 end
 ```
 
