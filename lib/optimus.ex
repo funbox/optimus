@@ -80,6 +80,7 @@ defmodule Optimus do
           | {:args, [arg_spec_item]}
           | {:flags, [flag_spec_item]}
           | {:options, [option_spec_item]}
+          | {:subcommands, [{atom, spec}]}
   @type spec :: [spec_item]
 
   @type error :: String.t()
