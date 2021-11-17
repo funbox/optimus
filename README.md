@@ -74,7 +74,7 @@ defmodule Statcalc do
         print_header: [
           short: "-h",
           long: "--print-header",
-          help: "Specifies wheather to print header before the outputs",
+          help: "Specifies whether to print header before the outputs",
           multiple: false,
         ],
         verbosity: [
@@ -148,7 +148,7 @@ Now if we try to launch our compiled escript without any args we'll see the foll
 
 ```
 >./statcalc
-The following errors occured:
+The following errors occurred:
 - missing required arguments: INPUT_FILE
 - missing required options: --from(-f), --to(-t)
 
@@ -186,7 +186,7 @@ ARGS:
 
 FLAGS:
 
-    -h, --print-header        Specifies wheather to print header before the
+    -h, --print-header        Specifies whether to print header before the
                               outputs
 
 OPTIONS:

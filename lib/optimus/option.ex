@@ -32,7 +32,7 @@ defmodule Optimus.Option do
                }", rest}
           end
         else
-          {:error, "multiple occurences of option #{Optimus.Format.format_in_error(option)}",
+          {:error, "multiple occurrences of option #{Optimus.Format.format_in_error(option)}",
            rest}
         end
 
