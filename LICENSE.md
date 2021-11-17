@@ -1,4 +1,6 @@
-Copyright 2016-2018 Ilya Averyanov
+# The MIT License
+
+Copyright (c) 2016 Ilya Averyanov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
