@@ -19,7 +19,7 @@ defmodule Optimus.Flag do
         if flag.multiple || !Map.has_key?(parsed, key) do
           {:ok, Map.update(parsed, key, 1, &(1 + &1)), new_items}
         else
-          {:error, "multiple occurences of flag #{Optimus.Format.format_in_error(flag)}",
+          {:error, "multiple occurrences of flag #{Optimus.Format.format_in_error(flag)}",
            new_items}
         end
 

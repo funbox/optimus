@@ -435,7 +435,7 @@ defmodule OptimusTest do
     assert {:ok, _} = Optimus.parse(optimus, ~w{-f VAL})
   end
 
-  test "parse: check multiple occurences for option" do
+  test "parse: check multiple occurrences for option" do
     {:ok, optimus} =
       Optimus.new(
         options: [
@@ -456,7 +456,7 @@ defmodule OptimusTest do
     assert {:ok, _} = Optimus.parse(optimus, ~w{-f a -f b -s c})
   end
 
-  test "parse: check multiple occurences for flag" do
+  test "parse: check multiple occurrences for flag" do
     {:ok, optimus} =
       Optimus.new(
         flags: [
@@ -618,7 +618,7 @@ defmodule OptimusTest do
                  fifth: [long: "--fifth", required: false],
                  sixth: [long: "--sixth", required: true],
                  eighth: [long: "--eighth", default: fn -> "8" end],
-                 nineth: [long: "--nineth", multiple: true, default: ["9"]]
+                 ninth: [long: "--ninth", multiple: true, default: ["9"]]
                ]
              )
 
@@ -632,7 +632,7 @@ defmodule OptimusTest do
     assert nil == parsed.options[:fifth]
     assert "6" == parsed.options[:sixth]
     assert "8" == parsed.options[:eighth]
-    assert ["9"] == parsed.options[:nineth]
+    assert ["9"] == parsed.options[:ninth]
   end
 
   test "parse: unknown" do

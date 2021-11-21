@@ -100,7 +100,7 @@ defmodule Optimus.PropertyParsers do
       {:ok, "--" <> trimmed_value}
     else
       {:error,
-       "value of #{inspect(name)} property is expected to be --XX...X or XX...X where XX...X is a sequence of characters whithout spaces"}
+       "value of #{inspect(name)} property is expected to be --XX...X or XX...X where XX...X is a sequence of characters without spaces"}
     end
   end
 
