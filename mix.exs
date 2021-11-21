@@ -1,14 +1,18 @@
 defmodule Optimus.Mixfile do
   use Mix.Project
 
+  @source_url "https://github.com/funbox/optimus"
+  @version "0.2.1"
+
   def project do
     [
       app: :optimus,
-      version: "0.2.1",
+      version: @version,
       elixir: "~> 1.3",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
+      docs: docs(),
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         coveralls: :test,
@@ -44,7 +48,7 @@ defmodule Optimus.Mixfile do
     [
       {:excoveralls, "~> 0.5", only: :test},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:ex_doc, ex_doc_version(), only: :dev}
+      {:ex_doc, ex_doc_version(), only: :dev, runtime: false}
     ]
   end
 
@@ -54,8 +58,23 @@ defmodule Optimus.Mixfile do
       files: ["lib", "mix.exs", "README*", "LICENSE*"],
       maintainers: ["Ilya Averyanov"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/funbox/optimus"},
+      links: %{"GitHub" => @source_url},
       description: "Command line option parser inspired by clap.rs"
+    ]
+  end
+
+  defp docs do
+    [
+      extras: [
+        "LICENSE.md": [title: "License"],
+        "README.md": [title: "Overview"]
+      ],
+      main: "readme",
+      assets: "assets",
+      logo: "assets/logo.png",
+      source_url: @source_url,
+      source_ref: "#{@version}",
+      formatters: ["html"]
     ]
   end
 end

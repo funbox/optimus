@@ -1,11 +1,14 @@
 # Optimus
 
-<img align="right" width="192" height="192"
-     alt="Optimus avatar: Transformer's head shaped as a letter “O”"
-     src="./logo.png">
+<img align="right" width="192" height="192" alt="Optimus avatar: Transformer's head shaped as a letter “O”" src="./assets/logo.png">
 
 [![Build Status](https://travis-ci.org/funbox/optimus.svg?branch=master)](https://travis-ci.org/funbox/optimus)
 [![Coverage Status](https://coveralls.io/repos/github/funbox/optimus/badge.svg?branch=master)](https://coveralls.io/github/funbox/optimus?branch=master)
+[![Module Version](https://img.shields.io/hexpm/v/optimus.svg)](https://hex.pm/packages/optimus)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/optimus/)
+[![Total Download](https://img.shields.io/hexpm/dt/optimus.svg)](https://hex.pm/packages/optimus)
+[![License](https://img.shields.io/hexpm/l/optimus.svg)](https://github.com/funbox/optimus/blob/master/LICENSE.md)
+[![Last Updated](https://img.shields.io/github/last-commit/funbox/optimus.svg)](https://github.com/funbox/optimus/commits/master)
 
 A command line arguments parsing library for [Elixir](http://elixir-lang.org).
 
@@ -25,7 +28,9 @@ Add `optimus` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:optimus, "~> 0.2"}]
+  [
+    {:optimus, "~> 0.2"}
+  ]
 end
 ```
 
@@ -240,5 +245,12 @@ which are maps, and `unknown`, which is a list. Things to note are:
 * [Kevin K.](https://github.com/kbknapp) and all other creators of [`clap.rs`](https://clap.rs)
 
 Brutal picture for the project was made by [Igor Garybaldi](http://pandabanda.com/).
+
+## Copyright and License
+
+Copyright (c) 2016 Ilya Averyanov
+
+This work is free. You can redistribute it and/or modify it under the
+terms of the MIT License. See the [LICENSE.md](./LICENSE.md) file for more details.
 
 [![Sponsored by FunBox](https://funbox.ru/badges/sponsored_by_funbox_centered.svg)](https://funbox.ru)
