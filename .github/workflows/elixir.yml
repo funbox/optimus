@@ -19,74 +19,73 @@ jobs:
           # Elixir 1.7
 
           - elixir: 1.7.4
-            otp_release: 19.3
+            otp_release: 21.3.8.24
 
           - elixir: 1.7.4
-            otp_release: 20.3
-
-          - elixir: 1.7.4
-            otp_release: 21.0
-
-          - elixir: 1.7.4
-            otp_release: 22.0
+            otp_release: 22.3.4.23
 
           # Elixir 1.8
 
           - elixir: 1.8.2
-            otp_release: 20.3
+            otp_release: 21.3.8.24
 
           - elixir: 1.8.2
-            otp_release: 21.0
-
-          - elixir: 1.8.2
-            otp_release: 22.0
+            otp_release: 22.3.4.23
 
           # Elixir 1.9
 
           - elixir: 1.9.0
-            otp_release: 20.3
+            otp_release: 21.3.8.24
 
           - elixir: 1.9.0
-            otp_release: 21.0
-
-          - elixir: 1.9.0
-            otp_release: 22.0
+            otp_release: 22.3.4.23
 
           # Elixir 1.10
 
           - elixir: 1.10.0
-            otp_release: 21.0
+            otp_release: 21.3.8.24
 
           - elixir: 1.10.0
-            otp_release: 22.0
+            otp_release: 22.3.4.23
 
           - elixir: 1.10.3
-            otp_release: 23.0
+            otp_release: 23.3.4.9
 
           # Elixir 1.11
 
-          - elixir: 1.11.0
-            otp_release: 21.0
-
-          - elixir: 1.11.0
-            otp_release: 22.0
-
-          - elixir: 1.11.0
-            otp_release: 23.0
+          - elixir: 1.11.4
+            otp_release: 21.3.8.24
 
           - elixir: 1.11.4
-            otp_release: 24.0
+            otp_release: 22.3.4.23
+
+          - elixir: 1.11.4
+            otp_release: 23.3.4.9
+
+          - elixir: 1.11.4
+            otp_release: 24.1.6
 
           # Elixir 1.12
 
-          - elixir: 1.12.0
-            otp_release: 22.0
+          - elixir: 1.12.3
+            otp_release: 22.3.4.23
 
-          - elixir: 1.12.0
-            otp_release: 23.0
+          - elixir: 1.12.3
+            otp_release: 23.3.4.9
 
-          - elixir: 1.12.0
-            otp_release: 24.0
+          - elixir: 1.12.3
+            otp_release: 24.1.6
+
+          # Elixir 1.13
+
+          - elixir: 1.13.0
+            otp_release: 22.3.4.23
+
+          - elixir: 1.13.0
+            otp_release: 23.3.4.9
+
+          - elixir: 1.13.0
+            otp_release: 24.1.6
 
     steps:
     - uses: actions/checkout@v2
