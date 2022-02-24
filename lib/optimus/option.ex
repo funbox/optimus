@@ -8,7 +8,8 @@ defmodule Optimus.Option do
     :multiple,
     :required,
     :default,
-    :parser
+    :parser,
+    :global
   ]
 
   def new(spec) do

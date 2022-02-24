@@ -4,7 +4,8 @@ defmodule Optimus.Flag do
     :short,
     :long,
     :help,
-    :multiple
+    :multiple,
+    :global
   ]
 
   def new(spec) do
