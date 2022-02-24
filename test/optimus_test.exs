@@ -129,6 +129,20 @@ defmodule OptimusTest do
     assert true = app.options |> Enum.at(0) |> Map.get(:global)
   end
 
+  test "option: hide" do
+    assert {:ok, app} =
+             Optimus.new(
+               options: [
+                 first: [
+                   short: "-f",
+                   hide: true
+                 ]
+               ]
+             )
+
+    assert true = app.options |> Enum.at(0) |> Map.get(:hide)
+  end
+
   test "option: invalid short" do
     assert {:error, _} =
              Optimus.new(
@@ -346,6 +360,10 @@ defmodule OptimusTest do
           long: "third-flag",
           help: "Third flag",
           global: true
+        ],
+        fourth: [
+          long: "fourth-flag",
+          hide: true
         ]
       ],
       options: [
@@ -377,6 +395,13 @@ defmodule OptimusTest do
           help: "Third option",
           parser: :integer,
           global: true
+        ],
+        fourth: [
+          value_name: "FOURTH_OPTION",
+          long: "fourth-option",
+          help: "Fourth option",
+          parser: :integer,
+          hide: true
         ]
       ],
       subcommands: [
@@ -823,15 +848,54 @@ defmodule OptimusTest do
   end
 
   test "help" do
+    flags = [
+      is_visible_flag: [
+        long: "--is-visible-flag",
+        help: "Is visible flag"
+      ],
+      is_hidden_flag: [
+        long: "--is-hidden-flag",
+        hide: true,
+        help: "Is hidden flag"
+      ]
+    ]
+
+    options = [
+      is_visible_option: [
+        long: "--is-visible-option",
+        help: "Is visible option"
+      ],
+      is_hidden_option: [
+        long: "--is-hidden-option",
+        hide: true,
+        help: "Is hidden option"
+      ]
+    ]
+
     {:ok, optimus} =
       Optimus.new(
         subcommands: [
           sub: [
             name: "sub"
           ]
-        ]
+        ],
+        flags: flags,
+        options: options
       )
 
-    assert is_binary(Optimus.help(optimus))
+    help = Optimus.help(optimus)
+
+    assert is_binary(help)
+
+    # Visible
+    assert String.contains?(help, "--is-visible-flag")
+    assert String.contains?(help, "--is-visible-option")
+
+    # Hidden
+    assert not String.contains?(help, "--is-hidden-flag"), "Found hidden flag"
+    assert not String.contains?(help, "--is-hidden-option"), "Found hidden option"
+
+    assert String.contains?(help, "visible"), "Visible informations are missing"
+    assert not String.contains?(help, "hidden"), "Contains hidden informations"
   end
 end

@@ -15,9 +15,14 @@ defmodule Optimus.FormatableHelp do
     widths = get_column_widths(formatables, max_width)
 
     formatables
+    |> Enum.filter(&is_visible?(&1))
     |> Enum.map(&format_columns(widths, &1))
     |> Enum.concat()
     |> Enum.map(&Enum.join(&1))
+  end
+
+  defp is_visible?(formatable) do
+    not Map.get(formatable, :hide, false)
   end
 
   defp format_columns({:ok, widths}, formatable) do

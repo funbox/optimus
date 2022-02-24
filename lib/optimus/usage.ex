@@ -1,8 +1,8 @@
 defmodule Optimus.Usage do
   def usage(optimus, subcommand_path \\ []) do
     {subcommand, subcommand_name} = Optimus.fetch_subcommand(optimus, subcommand_path)
-    flag_info = format_usage(subcommand.flags)
-    option_info = format_usage(subcommand.options)
+    flag_info = subcommand.flags |> Enum.filter(&(not &1.hide)) |> format_usage()
+    option_info = subcommand.options |> Enum.filter(&(not &1.hide)) |> format_usage()
     arg_info = format_arg_usage(subcommand)
     usage_parts = [subcommand_name, flag_info, option_info, arg_info]
 
