@@ -86,6 +86,7 @@ defmodule Statcalc do
           short: "-v",
           help: "Verbosity level",
           multiple: true,
+          global: true
         ],
       ],
       options: [
