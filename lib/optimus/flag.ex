@@ -5,7 +5,8 @@ defmodule Optimus.Flag do
     :long,
     :help,
     :multiple,
-    :global
+    :global,
+    :hide
   ]
 
   def new(spec) do
