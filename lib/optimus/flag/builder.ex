@@ -15,8 +15,9 @@ defmodule Optimus.Flag.Builder do
          {:ok, long} <- build_long(props),
          {:ok, help} <- build_help(props),
          {:ok, multiple} <- build_multiple(props),
+         {:ok, global} <- build_global(props),
          {:ok, flag} <-
-           validate(%Flag{flag | short: short, long: long, help: help, multiple: multiple}),
+           validate(%Flag{flag | short: short, long: long, help: help, multiple: multiple, global: global}),
          do: {:ok, flag}
   end
 
@@ -42,6 +43,10 @@ defmodule Optimus.Flag.Builder do
 
   defp build_multiple(props) do
     PP.build_bool(:multiple, props[:multiple], false)
+  end
+
+  def build_global(props) do
+    PP.build_bool(:global, props[:global], false)
   end
 
   defp validate(flag) do
