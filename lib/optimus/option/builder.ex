@@ -20,6 +20,7 @@ defmodule Optimus.Option.Builder do
          {:ok, default} <- build_default(props),
          {:ok, parser} <- build_parser(props),
          {:ok, global} <- build_global(props),
+         {:ok, hide} <- build_hide(props),
          {:ok, option} <-
            validate(%Option{
              option
@@ -31,7 +32,8 @@ defmodule Optimus.Option.Builder do
                required: required,
                default: default,
                parser: parser,
-               global: global
+               global: global,
+               hide: hide
            }),
          do: {:ok, option}
   end
@@ -79,6 +81,10 @@ defmodule Optimus.Option.Builder do
 
   defp build_global(props) do
     PP.build_bool(:global, props[:global], false)
+  end
+
+  defp build_hide(props) do
+    PP.build_bool(:hide, props[:hide], false)
   end
 
   defp validate(option) do
