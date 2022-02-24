@@ -115,6 +115,20 @@ defmodule OptimusTest do
              )
   end
 
+  test "option: global" do
+    assert {:ok, app} =
+             Optimus.new(
+               options: [
+                 first: [
+                   short: "-f",
+                   global: true
+                 ]
+               ]
+             )
+
+    assert true = app.options |> Enum.at(0) |> Map.get(:global)
+  end
+
   test "option: invalid short" do
     assert {:error, _} =
              Optimus.new(
@@ -327,6 +341,11 @@ defmodule OptimusTest do
           long: "second-flag",
           help: "Second flag",
           multiple: true
+        ],
+        third: [
+          long: "third-flag",
+          help: "Third flag",
+          global: true
         ]
       ],
       options: [
@@ -351,6 +370,13 @@ defmodule OptimusTest do
               {:error, "should be one of: DD, EE or FF"}
             end
           end
+        ],
+        third: [
+          value_name: "THIRD_OPTION",
+          long: "third-option",
+          help: "Third option",
+          parser: :integer,
+          global: true
         ]
       ],
       subcommands: [
@@ -618,11 +644,13 @@ defmodule OptimusTest do
                  fifth: [long: "--fifth", required: false],
                  sixth: [long: "--sixth", required: true],
                  eighth: [long: "--eighth", default: fn -> "8" end],
-                 ninth: [long: "--ninth", multiple: true, default: ["9"]]
+                 ninth: [long: "--ninth", multiple: true, default: ["9"]],
+                 tenth: [long: "--tenth", global: true, parser: :integer],
+                 eleventh: [long: "--eleventh", global: false, parser: :integer]
                ]
              )
 
-    command_line = ~w{-f 123 --second 2.5 -t a --third b --sixth=6}
+    command_line = ~w{-f 123 --second 2.5 -t a --third b --sixth=6 --tenth=4}
     assert {:ok, parsed} = Optimus.parse(optimus, command_line)
 
     assert 123 == parsed.options[:first]
@@ -633,6 +661,8 @@ defmodule OptimusTest do
     assert "6" == parsed.options[:sixth]
     assert "8" == parsed.options[:eighth]
     assert ["9"] == parsed.options[:ninth]
+    assert 4 == parsed.options[:tenth]
+    assert nil == parsed.options[:eleventh]
   end
 
   test "parse: unknown" do
@@ -666,6 +696,30 @@ defmodule OptimusTest do
     assert "a" == parsed.args[:first]
     assert true == parsed.flags[:first]
     assert "o" == parsed.options[:first]
+  end
+
+  test "parse: subcommand with global" do
+    assert {:ok, optimus} =
+             Optimus.new(
+               options: [
+                 verbose_level: [long: "--verbose-level", global: true, parser: :integer]
+               ],
+               flags: [
+                 active: [short: "-a", global: true],
+                 slow: [short: "-s", global: true],
+               ],
+               subcommands: [
+                 sub: [
+                   name: "sub"
+                 ]
+               ]
+             )
+
+    assert {:ok, [:sub], parsed} = Optimus.parse(optimus, ~w{sub --verbose-level=4 -a})
+
+    assert 4 == parsed.options[:verbose_level]
+    assert true == parsed.flags[:active]
+    assert false == parsed.flags[:slow]
   end
 
   test "parse: --version" do
@@ -748,5 +802,4 @@ defmodule OptimusTest do
 
     assert is_binary(Optimus.help(optimus))
   end
-
 end
