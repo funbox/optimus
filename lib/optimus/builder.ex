@@ -14,7 +14,8 @@ defmodule Optimus.Builder do
          {:ok, args} <- build_args(props[:args]),
          {:ok, flags} <- build_flags(props[:flags]),
          {:ok, options} <- build_options(props[:options]),
-         {:ok, subcommands} <- build_subcommands(props[:subcommands]),
+         {:ok, subcommands} <-
+           build_subcommands(props[:subcommands], fetch_global_props(flags, options)),
          :ok <- validate_args(args),
          :ok <- validate_conflicts(flags, options),
          do:
@@ -82,21 +83,23 @@ defmodule Optimus.Builder do
     with {:ok, arg} <- module.new(arg_spec), do: build_specs_(module, other, [arg | parsed])
   end
 
-  defp build_subcommands(nil), do: {:ok, []}
+  defp build_subcommands(nil, _gloal_props), do: {:ok, []}
 
-  defp build_subcommands(subcommands) do
+  defp build_subcommands(subcommands, gloal_props) do
     if Keyword.keyword?(subcommands) do
-      build_subcommands_(subcommands, [])
+      build_subcommands_(subcommands, gloal_props, [])
     else
       {:error, "subcommand specs are expected to be a Keyword list"}
     end
   end
 
-  defp build_subcommands_([], parsed), do: {:ok, Enum.reverse(parsed)}
+  defp build_subcommands_([], _gloal_props, parsed), do: {:ok, Enum.reverse(parsed)}
 
-  defp build_subcommands_([{subcommand_name, props} | other], parsed) do
+  defp build_subcommands_([{subcommand_name, props} | other], gloal_props, parsed) do
     case build(props) do
       {:ok, subcommand} ->
+        subcommand = merge_globals_into_subcommand(subcommand, gloal_props)
+
         subcommand_with_name =
           case subcommand.name do
             nil ->
@@ -106,7 +109,7 @@ defmodule Optimus.Builder do
               %Optimus{subcommand | subcommand: subcommand_name}
           end
 
-        build_subcommands_(other, [subcommand_with_name | parsed])
+        build_subcommands_(other, gloal_props, [subcommand_with_name | parsed])
 
       {:error, error} ->
         {:error, "error building subcommand #{inspect(subcommand_name)}: #{error}"}
@@ -151,5 +154,21 @@ defmodule Optimus.Builder do
       {name, _} -> {:error, "duplicate #{key} option name: #{name}"}
       nil -> :ok
     end
+  end
+
+  defp fetch_global_props(all_flags, all_options) do
+    global_flags = all_flags
+    |> Enum.filter(fn flag -> flag.global end)
+
+    global_options = all_options
+    |> Enum.filter(fn opt -> opt.global end)
+
+    %{flags: global_flags, options: global_options}
+  end
+
+  defp  merge_globals_into_subcommand(subcommand, %{flags: global_flags, options: global_options} = _gloal_props) do
+    subcommand
+    |> Map.update(:flags, [], fn flags -> flags ++ global_flags end)
+    |> Map.update(:options, [], fn options -> options ++ global_options end)
   end
 end
