@@ -160,15 +160,15 @@ defmodule Optimus.Builder do
     end
   end
 
-  defp build_global_props(all_flags, all_options, global_props) do
-    global_flags = build_global_props_by_type(all_flags, :flags, global_props)
-    global_options = build_global_props_by_type(all_options, :flags, global_flags)
+  defp build_global_props(local_flags, local_options, global_props) do
+    global_flags = build_global_props_by_type(local_flags, :flags, global_props)
+    global_options = build_global_props_by_type(local_options, :options, global_props)
 
     {:ok, %{flags: global_flags, options: global_options}}
   end
 
-  defp build_global_props_by_type(all_props, type, global_props) do
-    all_props
+  defp build_global_props_by_type(local_props, type, global_props) do
+    local_props
     # Keep only global flags
     |> Enum.filter(& &1.global)
     # Hide global props on subcommands
