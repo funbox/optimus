@@ -3,6 +3,10 @@ defmodule Optimus.Builder do
   alias Optimus.PropertyParsers, as: PP
 
   def build(props) do
+    build_(props)
+  end
+
+  def build_(props, global_props \\ %{}) do
     with :ok <- validate_keyword_list(props),
          {:ok, name} <- build_name(props),
          {:ok, description} <- build_description(props),
@@ -15,7 +19,10 @@ defmodule Optimus.Builder do
          {:ok, flags} <- build_flags(props[:flags]),
          {:ok, options} <- build_options(props[:options]),
          {:ok, subcommands} <-
-           build_subcommands(props[:subcommands], fetch_global_props(flags, options)),
+           build_subcommands(
+             props[:subcommands],
+             build_global_props(flags, options, global_props)
+           ),
          :ok <- validate_args(args),
          :ok <- validate_conflicts(flags, options),
          do:
@@ -96,7 +103,7 @@ defmodule Optimus.Builder do
   defp build_subcommands_([], _gloal_props, parsed), do: {:ok, Enum.reverse(parsed)}
 
   defp build_subcommands_([{subcommand_name, props} | other], gloal_props, parsed) do
-    case build(props) do
+    case build_(props, gloal_props) do
       {:ok, subcommand} ->
         subcommand = merge_globals_into_subcommand(subcommand, gloal_props)
 
@@ -156,17 +163,28 @@ defmodule Optimus.Builder do
     end
   end
 
-  defp fetch_global_props(all_flags, all_options) do
-    global_flags = all_flags
-    |> Enum.filter(fn flag -> flag.global end)
+  defp build_global_props(all_flags, all_options, global_props) do
+    global_flags =
+      all_flags
+      # Keep only global flags
+      |> Enum.filter(fn flag -> flag.global end)
+      # Add previous defined global flags
+      |> Kernel.++(Map.get(global_props, :flags, []))
 
-    global_options = all_options
-    |> Enum.filter(fn opt -> opt.global end)
+    global_options =
+      all_options
+      # Keep only global options
+      |> Enum.filter(fn opt -> opt.global end)
+      # Add previous defined global options
+      |> Kernel.++(Map.get(global_props, :options, []))
 
     %{flags: global_flags, options: global_options}
   end
 
-  defp  merge_globals_into_subcommand(subcommand, %{flags: global_flags, options: global_options} = _gloal_props) do
+  defp merge_globals_into_subcommand(
+         subcommand,
+         %{flags: global_flags, options: global_options} = _gloal_props
+       ) do
     subcommand
     |> Map.update(:flags, [], fn flags -> flags ++ global_flags end)
     |> Map.update(:options, [], fn options -> options ++ global_options end)

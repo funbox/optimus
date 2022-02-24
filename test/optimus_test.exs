@@ -706,7 +706,7 @@ defmodule OptimusTest do
                ],
                flags: [
                  active: [short: "-a", global: true],
-                 slow: [short: "-s", global: true],
+                 slow: [short: "-s", global: true]
                ],
                subcommands: [
                  sub: [
@@ -716,6 +716,38 @@ defmodule OptimusTest do
              )
 
     assert {:ok, [:sub], parsed} = Optimus.parse(optimus, ~w{sub --verbose-level=4 -a})
+
+    assert 4 == parsed.options[:verbose_level]
+    assert true == parsed.flags[:active]
+    assert false == parsed.flags[:slow]
+  end
+
+  test "parse: deep nested command with global" do
+    assert {:ok, optimus} =
+             Optimus.new(
+               options: [
+                 verbose_level: [long: "--verbose-level", global: true, parser: :integer]
+               ],
+               flags: [
+                 active: [short: "-a", global: true]
+               ],
+               subcommands: [
+                 sub: [
+                   name: "sub",
+                   flags: [
+                     slow: [short: "-s", global: true]
+                   ],
+                   subcommands: [
+                     subsub: [
+                       name: "subsub"
+                     ]
+                   ]
+                 ]
+               ]
+             )
+
+    assert {:ok, [:sub, :subsub], parsed} =
+             Optimus.parse(optimus, ~w{sub subsub --verbose-level=4 -a})
 
     assert 4 == parsed.options[:verbose_level]
     assert true == parsed.flags[:active]
