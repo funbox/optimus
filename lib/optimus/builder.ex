@@ -18,11 +18,8 @@ defmodule Optimus.Builder do
          {:ok, args} <- build_args(props[:args]),
          {:ok, flags} <- build_flags(props[:flags]),
          {:ok, options} <- build_options(props[:options]),
-         {:ok, subcommands} <-
-           build_subcommands(
-             props[:subcommands],
-             build_global_props(flags, options, global_props)
-           ),
+         {:ok, global_props} <- build_global_props(flags, options, global_props),
+         {:ok, subcommands} <- build_subcommands(props[:subcommands], global_props),
          :ok <- validate_args(args),
          :ok <- validate_conflicts(flags, options),
          do:
@@ -102,10 +99,10 @@ defmodule Optimus.Builder do
 
   defp build_subcommands_([], _gloal_props, parsed), do: {:ok, Enum.reverse(parsed)}
 
-  defp build_subcommands_([{subcommand_name, props} | other], gloal_props, parsed) do
-    case build_(props, gloal_props) do
+  defp build_subcommands_([{subcommand_name, props} | other], global_props, parsed) do
+    case build_(props, global_props) do
       {:ok, subcommand} ->
-        subcommand = merge_globals_into_subcommand(subcommand, gloal_props)
+        subcommand = merge_globals_into_subcommand(subcommand, global_props)
 
         subcommand_with_name =
           case subcommand.name do
@@ -116,7 +113,7 @@ defmodule Optimus.Builder do
               %Optimus{subcommand | subcommand: subcommand_name}
           end
 
-        build_subcommands_(other, gloal_props, [subcommand_with_name | parsed])
+        build_subcommands_(other, global_props, [subcommand_with_name | parsed])
 
       {:error, error} ->
         {:error, "error building subcommand #{inspect(subcommand_name)}: #{error}"}
@@ -164,21 +161,20 @@ defmodule Optimus.Builder do
   end
 
   defp build_global_props(all_flags, all_options, global_props) do
-    global_flags =
-      all_flags
-      # Keep only global flags
-      |> Enum.filter(fn flag -> flag.global end)
-      # Add previous defined global flags
-      |> Kernel.++(Map.get(global_props, :flags, []))
+    global_flags = build_global_props_by_type(all_flags, :flags, global_props)
+    global_options = build_global_props_by_type(all_options, :flags, global_flags)
 
-    global_options =
-      all_options
-      # Keep only global options
-      |> Enum.filter(fn opt -> opt.global end)
-      # Add previous defined global options
-      |> Kernel.++(Map.get(global_props, :options, []))
+    {:ok, %{flags: global_flags, options: global_options}}
+  end
 
-    %{flags: global_flags, options: global_options}
+  defp build_global_props_by_type(all_props, type, global_props) do
+    all_props
+    # Keep only global flags
+    |> Enum.filter(& &1.global)
+    # Hide global props on subcommands
+    |> Enum.map(&%{&1 | hide: true})
+    # Add previous defined global flags
+    |> Kernel.++(Map.get(global_props, type, []))
   end
 
   defp merge_globals_into_subcommand(
