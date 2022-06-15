@@ -78,14 +78,17 @@ jobs:
 
           # Elixir 1.13
 
-          - elixir: 1.13.0
+          - elixir: 1.13.4
             otp_release: 22.3.4.23
 
-          - elixir: 1.13.0
+          - elixir: 1.13.4
             otp_release: 23.3.4.9
 
-          - elixir: 1.13.0
+          - elixir: 1.13.4
             otp_release: 24.1.6
+
+          - elixir: 1.13.4
+            otp_release: 25.0.1
 
     steps:
     - uses: actions/checkout@v2
