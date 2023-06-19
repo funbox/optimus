@@ -16,22 +16,6 @@ jobs:
       matrix:
         include:
 
-          # Elixir 1.7
-
-          - elixir: 1.7.4
-            otp_release: 21.3.8.24
-
-          - elixir: 1.7.4
-            otp_release: 22.3.4.23
-
-          # Elixir 1.8
-
-          - elixir: 1.8.2
-            otp_release: 21.3.8.24
-
-          - elixir: 1.8.2
-            otp_release: 22.3.4.23
-
           # Elixir 1.9
 
           - elixir: 1.9.0
@@ -78,14 +62,28 @@ jobs:
 
           # Elixir 1.13
 
-          - elixir: 1.13.0
+          - elixir: 1.13.4
             otp_release: 22.3.4.23
 
-          - elixir: 1.13.0
+          - elixir: 1.13.4
             otp_release: 23.3.4.9
 
-          - elixir: 1.13.0
-            otp_release: 24.1.6
+          - elixir: 1.13.4
+            otp_release: 24.2.1
+
+          - elixir: 1.13.4
+            otp_release: 25.1.1
+
+          # Elixir 1.14
+
+          - elixir: 1.14.1
+            otp_release: 23.3.4.9
+
+          - elixir: 1.14.1
+            otp_release: 24.2.1
+
+          - elixir: 1.14.1
+            otp_release: 25.1.1
 
     steps:
     - uses: actions/checkout@v2
