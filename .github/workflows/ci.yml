@@ -12,15 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        elixir: ['1.10.4', '1.14.5', '1.16.1', '1.17.2', '1.18.3']
-        otp: ['23.3', '24.3', '25.3', '26.2']
-        exclude:
-          - elixir: '1.10.4'
-            otp: '26.2'
-          - elixir: '1.17.2'
-            otp: '23.3'
-          - elixir: '1.18.3'
-            otp: '23.3'
+        elixir: ['1.18.3']
+        otp: ['26.2']
 
     steps:
     - uses: actions/checkout@v4

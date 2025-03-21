@@ -1,7 +1,7 @@
 defmodule Optimus.PropertyParsers do
   @moduledoc """
   Contains utilities for parsing and validating Optimus configuration properties.
-  
+
   This module includes functions for:
   - Creating parsers for various types (:integer, :float, :string)
   - Validating configuration values
