@@ -1,11 +1,25 @@
 defmodule Optimus.Flag do
-  defstruct [
-    :name,
-    :short,
-    :long,
-    :help,
-    :multiple
-  ]
+  @moduledoc """
+  Represents a command line flag (like -v or --verbose).
+
+  Flags are boolean switches that can be present or absent. They can optionally be counted
+  if the `multiple` option is set to true.
+  """
+
+  @typedoc "Flag structure"
+  @type t :: %__MODULE__{
+          name: atom(),
+          short: String.t() | nil,
+          long: String.t() | nil,
+          help: String.t() | nil,
+          multiple: boolean()
+        }
+
+  defstruct name: nil,
+            short: nil,
+            long: nil,
+            help: nil,
+            multiple: false
 
   def new(spec) do
     Optimus.Flag.Builder.build(spec)

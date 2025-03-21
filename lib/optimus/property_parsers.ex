@@ -1,4 +1,24 @@
 defmodule Optimus.PropertyParsers do
+  @moduledoc """
+  Contains utilities for parsing and validating Optimus configuration properties.
+  
+  This module includes functions for:
+  - Creating parsers for various types (:integer, :float, :string)
+  - Validating configuration values
+  - Converting values to correct format
+
+  ## Examples
+
+      iex> {:ok, parser} = Optimus.PropertyParsers.build_parser(:my_prop, :integer)
+      iex> is_function(parser, 1)
+      true
+      
+      iex> Optimus.PropertyParsers.build_string(:name, "value")
+      {:ok, "value"}
+      
+      iex> Optimus.PropertyParsers.build_bool(:flag, true, false)
+      {:ok, true}
+  """
   def build_parser(_name, :integer) do
     {:ok, &integer_parser/1}
   end
@@ -78,7 +98,7 @@ defmodule Optimus.PropertyParsers do
   def build_short(_name, nil), do: {:ok, nil}
 
   def build_short(name, value) when is_binary(value) do
-    trimmed_value = String.replace(value, ~r{\A[\-]+}, "")
+    trimmed_value = String.trim_leading(value, "-")
 
     if trimmed_value =~ ~r{\A[A-Za-z]\z} do
       {:ok, "-" <> trimmed_value}
@@ -94,7 +114,7 @@ defmodule Optimus.PropertyParsers do
   def build_long(_name, nil), do: {:ok, nil}
 
   def build_long(name, value) when is_binary(value) do
-    trimmed_value = String.replace(value, ~r{\A[\-]+}, "")
+    trimmed_value = String.trim_leading(value, "-")
 
     if trimmed_value =~ ~r{\A[^\s]+\z} do
       {:ok, "--" <> trimmed_value}

@@ -8,7 +8,7 @@ defmodule Optimus.Mixfile do
     [
       app: :optimus,
       version: @version,
-      elixir: "~> 1.3",
+      elixir: "~> 1.18",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -21,34 +21,27 @@ defmodule Optimus.Mixfile do
         "coveralls.html": :test
       ],
       dialyzer: [
-        plt_add_deps: true,
+        plt_add_deps: :apps_direct,
         plt_add_apps: [:ssl],
         flags: ["-Werror_handling", "-Wrace_conditions"]
       ],
-      package: package()
+      package: package(),
+      aliases: aliases()
     ]
   end
 
   def application do
-    [applications: [:logger]]
-  end
-
-  cond do
-    System.version() |> Version.match?(">= 1.10.0") ->
-      def ex_doc_version(), do: "~> 0.23"
-
-    System.version() |> Version.match?(">= 1.7.0") ->
-      def ex_doc_version(), do: "~> 0.22.0"
-
-    true ->
-      def ex_doc_version(), do: "~> 0.18.0"
+    [
+      extra_applications: [:logger]
+    ]
   end
 
   defp deps do
     [
-      {:excoveralls, "~> 0.5", only: :test},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:ex_doc, ex_doc_version(), only: :dev, runtime: false}
+      {:excoveralls, "~> 0.18", only: :test},
+      {:dialyxir, "~> 1.4", only: [:dev], runtime: false},
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -74,7 +67,15 @@ defmodule Optimus.Mixfile do
       logo: "assets/logo.png",
       source_url: @source_url,
       source_ref: "#{@version}",
-      formatters: ["html"]
+      formatters: ["html"],
+      api_reference: true
+    ]
+  end
+
+  defp aliases do
+    [
+      check: ["format", "credo --strict", "dialyzer"],
+      "format.check": ["format --check-formatted"]
     ]
   end
 end

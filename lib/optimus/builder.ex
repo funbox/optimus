@@ -1,4 +1,10 @@
 defmodule Optimus.Builder do
+  @moduledoc """
+  Constructs and validates Optimus configuration from raw input.
+  
+  This module handles the conversion of keyword list options 
+  into the structured Optimus data format while validating all inputs.
+  """
   alias Optimus
   alias Optimus.PropertyParsers, as: PP
 

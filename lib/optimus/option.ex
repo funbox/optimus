@@ -1,15 +1,33 @@
 defmodule Optimus.Option do
-  defstruct [
-    :name,
-    :value_name,
-    :short,
-    :long,
-    :help,
-    :multiple,
-    :required,
-    :default,
-    :parser
-  ]
+  @moduledoc """
+  Represents a command line option with a value (like --count 5 or -c 5).
+
+  Options take a value and can be required or optional.
+  They can have default values and support multiple occurrences.
+  """
+
+  @typedoc "Option structure"
+  @type t :: %__MODULE__{
+          name: atom(),
+          value_name: String.t(),
+          short: String.t() | nil,
+          long: String.t() | nil,
+          help: String.t() | nil,
+          multiple: boolean(),
+          required: boolean(),
+          default: term() | nil,
+          parser: (String.t() -> {:ok, term()} | {:error, String.t()})
+        }
+
+  defstruct name: nil,
+            value_name: nil,
+            short: nil,
+            long: nil,
+            help: nil,
+            multiple: false,
+            required: false,
+            default: nil,
+            parser: nil
 
   def new(spec) do
     Optimus.Option.Builder.build(spec)
@@ -27,9 +45,8 @@ defmodule Optimus.Option do
 
             {:error, reason} ->
               {:error,
-               "invalid value #{inspect(raw_value)} for #{Optimus.Format.format_in_error(option)} option: #{
-                 reason
-               }", rest}
+               "invalid value #{inspect(raw_value)} for #{Optimus.Format.format_in_error(option)} option: #{reason}",
+               rest}
           end
         else
           {:error, "multiple occurrences of option #{Optimus.Format.format_in_error(option)}",
@@ -68,7 +85,8 @@ defmodule Optimus.Option do
       length = String.length(option.long) + 1
 
       if option.long <> "=" == String.slice(str, 0..(length - 1)) do
-        {:ok, String.slice(str, length..-1)}
+        # Use String.slice with range and step to avoid deprecation warning
+        {:ok, String.slice(str, length..-1//1)}
       else
         :none
       end

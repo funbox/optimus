@@ -748,5 +748,4 @@ defmodule OptimusTest do
 
     assert is_binary(Optimus.help(optimus))
   end
-
 end

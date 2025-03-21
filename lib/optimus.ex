@@ -1,29 +1,58 @@
 defmodule Optimus do
+  @moduledoc """
+  Optimus is a command line argument parsing library for Elixir.
+
+  It's aim is to take off the maximum possible amount of manual argument handling.
+  The intended use case is to configure Optimus parser, run it against the
+  command line and then do nothing but take completely validated
+  ready to use values.
+  """
+
   alias Optimus.Arg
   alias Optimus.Flag
   alias Optimus.Option
 
-  defstruct [
-    :name,
-    :description,
-    :version,
-    :author,
-    :about,
-    :allow_unknown_args,
-    :parse_double_dash,
-    :args,
-    :flags,
-    :options,
-    :subcommands,
-    :subcommand
-  ]
+  @typedoc "Main Optimus configuration struct"
+  @opaque t :: %__MODULE__{
+            name: String.t() | nil,
+            description: String.t() | nil,
+            version: String.t() | nil,
+            author: String.t() | nil,
+            about: String.t() | nil,
+            allow_unknown_args: boolean() | nil,
+            parse_double_dash: boolean() | nil,
+            args: [Arg.t()],
+            flags: [Flag.t()],
+            options: [Option.t()],
+            subcommands: [t()],
+            subcommand: atom() | nil
+          }
+
+  defstruct name: nil,
+            description: nil,
+            version: nil,
+            author: nil,
+            about: nil,
+            allow_unknown_args: nil,
+            parse_double_dash: nil,
+            args: [],
+            flags: [],
+            options: [],
+            subcommands: [],
+            subcommand: nil
 
   defmodule ParseResult do
+    @moduledoc """
+    Struct containing the results of command line argument parsing.
+
+    Contains parsed arguments, flags, options, and any unknown arguments if allowed.
+    """
+
     @type arg_value :: term
     @type flag_value :: boolean | pos_integer
     @type option_value :: term | [term]
 
-    @type t :: %ParseResult{
+    @type t :: %__MODULE__{
             args: %{atom => arg_value},
             flags: %{atom => flag_value},
             options: %{atom => option_value},
@@ -37,6 +66,9 @@ defmodule Optimus do
   end
 
   defmodule OptimusConfigurationError do
+    @moduledoc """
+    Exception raised when Optimus configuration is invalid.
+    """
     defexception message: "invalid optimus configuration"
   end
 
@@ -84,8 +116,24 @@ defmodule Optimus do
   @type spec :: [spec_item]
 
   @type error :: String.t()
-  @opaque t :: %Optimus{}
 
+  @doc """
+  Creates a new Optimus parser from the given specification.
+
+  Returns {:ok, optimus} if the specification is valid, or {:error, errors} if invalid.
+
+  ## Examples
+
+      iex> {:ok, optimus} = Optimus.new(
+      ...>   name: "myapp",
+      ...>   description: "My CLI App",
+      ...>   version: "1.0.0",
+      ...>   author: "Author",
+      ...>   about: "Does awesome things"
+      ...> )
+      iex> is_map(optimus)
+      true
+  """
   @spec new(spec) :: {:ok, t} | {:error, [error]}
   def new(props) do
     props
@@ -93,6 +141,11 @@ defmodule Optimus do
     |> Optimus.Builder.build()
   end
 
+  @doc """
+  Creates a new Optimus parser from the given specification.
+
+  Similar to `new/1` but raises an `OptimusConfigurationError` if the specification is invalid.
+  """
   @spec new!(spec) :: t | no_return
   def new!(props) do
     case new(props) do
@@ -106,6 +159,35 @@ defmodule Optimus do
 
   @type subcommand_path :: [atom]
 
+  @doc """
+  Parses the command line arguments against the Optimus parser.
+
+  Returns one of:
+  - `{:ok, parse_result}` - successful parse with no subcommand
+  - `{:ok, subcommand_path, parse_result}` - successful parse with subcommand
+  - `{:error, errors}` - parse errors with no subcommand
+  - `{:error, subcommand_path, errors}` - parse errors with subcommand
+  - `:version` - when `--version` flag is present
+  - `:help` - when `--help` flag is present
+  - `{:help, subcommand_path}` - when help for a subcommand is requested
+
+  ## Examples
+
+      iex> {:ok, optimus} = Optimus.new(
+      ...>   name: "myapp",
+      ...>   args: [
+      ...>     input: [
+      ...>       value_name: "INPUT",
+      ...>       help: "Input file",
+      ...>       required: true,
+      ...>       parser: :string
+      ...>     ]
+      ...>   ]
+      ...> )
+      iex> {:ok, result} = Optimus.parse(optimus, ["input.txt"])
+      iex> result.args.input
+      "input.txt"
+  """
   @spec parse(t, [String.t()]) ::
           {:ok, ParseResult.t()}
           | {:ok, subcommand_path, ParseResult.t()}
@@ -132,9 +214,16 @@ defmodule Optimus do
          do: parse_result(sub_optimus, subcommand_path, parsed, unknown, all_errors)
   end
 
+  @doc """
+  Parses the command line arguments against the Optimus parser.
+
+  Similar to `parse/2` but handles error cases and special commands (help, version)
+  by displaying appropriate output and halting execution.
+
+  When parsing is successful, returns the parse result or {subcommand_path, parse_result}.
+  """
   @spec parse!(t, [String.t()], (integer -> no_return)) ::
           ParseResult.t() | {subcommand_path, ParseResult.t()} | no_return
-
   def parse!(optimus, command_line, halt \\ &System.halt/1) do
     case parse(optimus, command_line) do
       {:ok, parse_result} ->
@@ -165,6 +254,12 @@ defmodule Optimus do
     end
   end
 
+  @doc """
+  Generates help text for the given Optimus parser.
+
+  Returns the help text as a string.
+  """
+  @spec help(t) :: String.t()
   def help(optimus) do
     optimus
     |> Optimus.Help.help([], columns())
@@ -208,9 +303,16 @@ defmodule Optimus do
     end
   end
 
+  @doc """
+  Fetches a subcommand by path.
+
+  Returns a tuple with the subcommand and its full path name.
+  """
+  @spec fetch_subcommand(t(), subcommand_path()) :: {t(), [String.t()]}
   def fetch_subcommand(optimus, subcommand_path),
     do: fetch_subcommand(optimus, subcommand_path, [optimus.name])
 
+  @spec fetch_subcommand(t(), subcommand_path(), [String.t()]) :: {t(), [String.t()]}
   def fetch_subcommand(optimus, [], subcommand_name), do: {optimus, Enum.reverse(subcommand_name)}
 
   def fetch_subcommand(optimus, [subcommand_id | subcommand_path], subcommand_name) do
@@ -370,7 +472,7 @@ defmodule Optimus do
     if optimus.allow_unknown_args do
       errors
     else
-      error = "unrecognized arguments: #{unknown |> Enum.map(&inspect/1) |> Enum.join(", ")}"
+      error = "unrecognized arguments: #{Enum.map_join(unknown, ", ", &inspect/1)}"
       [error | errors]
     end
   end

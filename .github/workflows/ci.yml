@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        elixir: ['1.10.4', '1.14.5', '1.16.1', '1.17.2', '1.18.3']
+        otp: ['23.3', '24.3', '25.3', '26.2']
+        exclude:
+          - elixir: '1.10.4'
+            otp: '26.2'
+          - elixir: '1.17.2'
+            otp: '23.3'
+          - elixir: '1.18.3'
+            otp: '23.3'
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1.16.0
+      with:
+        elixir-version: ${{ matrix.elixir }}
+        otp-version: ${{ matrix.otp }}
+    
+    - name: Restore dependencies cache
+      uses: actions/cache@v4
+      with:
+        path: deps
+        key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+        restore-keys: ${{ runner.os }}-mix-
+    
+    - name: Get dependencies
+      run: mix deps.get
+    
+    - name: Compile
+      run: mix compile --warnings-as-errors
+    
+    - name: Run tests
+      run: mix test
+    
+    - name: Check formatting
+      run: mix format --check-formatted
+      
+    - name: Run Credo
+      run: mix credo --strict
+      if: ${{ matrix.elixir == '1.18.3' }}
+    
+    - name: Run dialyzer
+      run: mix dialyzer
+      if: ${{ matrix.elixir == '1.18.3' }}

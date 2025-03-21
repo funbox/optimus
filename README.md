@@ -2,7 +2,7 @@
 
 <img align="right" width="192" height="192" alt="Optimus avatar: Transformer's head shaped as a letter “O”" src="./assets/logo.png">
 
-[![Build Status](https://travis-ci.org/funbox/optimus.svg?branch=master)](https://travis-ci.org/funbox/optimus)
+[![Build Status](https://github.com/funbox/optimus/actions/workflows/ci.yml/badge.svg)](https://github.com/funbox/optimus/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/funbox/optimus/badge.svg?branch=master)](https://coveralls.io/github/funbox/optimus?branch=master)
 [![Module Version](https://img.shields.io/hexpm/v/optimus.svg)](https://hex.pm/packages/optimus)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/optimus/)
@@ -29,7 +29,7 @@ Add `optimus` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:optimus, "~> 0.2"}
+    {:optimus, "~> 0.3"}
   ]
 end
 ```

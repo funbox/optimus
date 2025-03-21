@@ -1,11 +1,25 @@
 defmodule Optimus.Arg do
-  defstruct [
-    :name,
-    :value_name,
-    :help,
-    :required,
-    :parser
-  ]
+  @moduledoc """
+  Represents a positional command line argument.
+
+  Arguments are positional parameters that are required or optional.
+  They can be parsed into various types using a parser function.
+  """
+
+  @typedoc "Argument structure"
+  @type t :: %__MODULE__{
+          name: atom(),
+          value_name: String.t(),
+          help: String.t() | nil,
+          required: boolean(),
+          parser: (String.t() -> {:ok, term()} | {:error, String.t()})
+        }
+
+  defstruct name: nil,
+            value_name: nil,
+            help: nil,
+            required: false,
+            parser: nil
 
   def new(spec) do
     Optimus.Arg.Builder.build(spec)
