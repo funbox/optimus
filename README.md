@@ -23,7 +23,9 @@ Add `optimus` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:optimus, "~> 0.3"}
+    # # Original version
+    # {:optimus, "~> 0.3"}
+    {:optimus, github: "matthewsinclair/arca-optimus", branch: "main", override: true}
   ]
 end
 ```
