@@ -20,7 +20,7 @@ defmodule Optimus.Option.Builder do
          {:ok, default} <- build_default(props),
          {:ok, parser} <- build_parser(props),
          {:ok, option} <-
-           validate(%Option{
+           validate(%{
              option
              | value_name: value_name,
                short: short,

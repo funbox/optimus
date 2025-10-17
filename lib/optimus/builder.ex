@@ -1,4 +1,10 @@
 defmodule Optimus.Builder do
+  @moduledoc """
+  Constructs and validates Optimus configuration from raw input.
+
+  This module handles the conversion of keyword list options 
+  into the structured Optimus data format while validating all inputs.
+  """
   alias Optimus
   alias Optimus.PropertyParsers, as: PP
 
@@ -100,10 +106,10 @@ defmodule Optimus.Builder do
         subcommand_with_name =
           case subcommand.name do
             nil ->
-              %Optimus{subcommand | subcommand: subcommand_name, name: to_string(subcommand_name)}
+              %{subcommand | subcommand: subcommand_name, name: to_string(subcommand_name)}
 
             _ ->
-              %Optimus{subcommand | subcommand: subcommand_name}
+              %{subcommand | subcommand: subcommand_name}
           end
 
         build_subcommands_(other, [subcommand_with_name | parsed])

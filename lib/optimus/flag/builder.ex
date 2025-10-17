@@ -16,7 +16,7 @@ defmodule Optimus.Flag.Builder do
          {:ok, help} <- build_help(props),
          {:ok, multiple} <- build_multiple(props),
          {:ok, flag} <-
-           validate(%Flag{flag | short: short, long: long, help: help, multiple: multiple}),
+           validate(%{flag | short: short, long: long, help: help, multiple: multiple}),
          do: {:ok, flag}
   end
 

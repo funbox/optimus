@@ -16,8 +16,7 @@ defmodule Optimus.Arg.Builder do
          {:ok, required} <- build_required(props),
          {:ok, parser} <- build_parser(props),
          do:
-           {:ok,
-            %Arg{arg | value_name: value_name, help: help, required: required, parser: parser}}
+           {:ok, %{arg | value_name: value_name, help: help, required: required, parser: parser}}
   end
 
   defp validate_keyword_list(name, list) do
