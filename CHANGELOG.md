@@ -12,8 +12,10 @@
 - Added doctests and examples
 
 ### Changed
-- Updated Elixir compatibility to support 1.10 through 1.18
+- Updated Elixir compatibility to support 1.10 through 1.19
 - Modernized mix.exs structure and dependency versions
+- Moved `preferred_cli_env` from `project/0` to `cli/0` function (Elixir 1.19)
+- Converted struct update syntax to map update syntax for Elixir 1.19 type safety
 - Renamed `applications` to `extra_applications` in mix.exs
 - Updated struct definitions to use key-value pairs with defaults
 - Fixed deprecation warnings for String.slice with negative index
