@@ -12,6 +12,8 @@
 
 A command line arguments parsing library for [Elixir](http://elixir-lang.org).
 
+> **Maintenance note: this repository is no longer actively maintained in the funbox organization. Active development and support continue at [savonarola/optimus](https://github.com/savonarola/optimus).**
+
 It's aim is to take off the maximum possible amount of manual argument handling.
 The intended use case is to configure Optimus parser, run it against the
 command line and then do nothing but take completely validated
